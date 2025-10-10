@@ -1,4 +1,4 @@
-package exampleapi
+package main
 
 import "fmt"
 
