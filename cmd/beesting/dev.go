@@ -43,7 +43,7 @@ var devCmd = &cobra.Command{
 
 		// Fall back to go run
 		fmt.Printf("🐝 Starting %s in development mode...\n", name)
-		fmt.Println("   (Install Air for hot-reloading: go install github.com/air-verse/air@latest)\n")
+		fmt.Println("   (Install Air for hot-reloading: go install github.com/air-verse/air@latest)")
 
 		runCmd := exec.Command("go", "run", mainGoPath)
 		runCmd.Stdout = os.Stdout
