@@ -13,7 +13,7 @@ import (
 var devCmd = &cobra.Command{
 	Use:   "dev [name]",
 	Short: "Start an application in development mode",
-	Long:  `Start an application in development mode by running its main.go file.`,
+	Long:  `Start an application in development mode with hot-reloading (using Air if available).`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
@@ -30,9 +30,21 @@ var devCmd = &cobra.Command{
 			return fmt.Errorf("main.go not found in app '%s'", name)
 		}
 
-		fmt.Printf("🐝 Starting %s in development mode...\n\n", name)
+		// Get absolute path to app directory
+		absAppDir, err := filepath.Abs(appDir)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path: %w", err)
+		}
 
-		// Run the app with go run
+		// Check if Air is installed
+		if isAirInstalled() {
+			return runWithAir(name, absAppDir)
+		}
+
+		// Fall back to go run
+		fmt.Printf("🐝 Starting %s in development mode...\n", name)
+		fmt.Println("   (Install Air for hot-reloading: go install github.com/air-verse/air@latest)\n")
+
 		runCmd := exec.Command("go", "run", mainGoPath)
 		runCmd.Stdout = os.Stdout
 		runCmd.Stderr = os.Stderr
@@ -44,4 +56,68 @@ var devCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+// isAirInstalled checks if Air is available in the PATH
+func isAirInstalled() bool {
+	_, err := exec.LookPath("air")
+	return err == nil
+}
+
+// runWithAir runs the app with Air for hot-reloading
+func runWithAir(name, appDir string) error {
+	fmt.Printf("🐝 Starting %s with hot-reloading (Air)...\n\n", name)
+
+	// Create temporary .air.toml for this app
+	airConfig := fmt.Sprintf(`root = "%s"
+tmp_dir = "%s/tmp"
+
+[build]
+  bin = "%s/tmp/main"
+  cmd = "go build -o %s/tmp/main %s"
+  delay = 1000
+  exclude_dir = ["tmp"]
+  exclude_regex = ["_test.go"]
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  kill_delay = "500ms"
+  rerun = false
+  rerun_delay = 500
+  send_interrupt = true
+  stop_on_error = false
+
+[color]
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  main_only = false
+  time = false
+
+[screen]
+  clear_on_rebuild = true
+`, appDir, appDir, appDir, appDir, appDir)
+
+	// Write temporary config
+	tmpConfigPath := filepath.Join(appDir, ".air.toml")
+	if err := os.WriteFile(tmpConfigPath, []byte(airConfig), 0644); err != nil {
+		return fmt.Errorf("failed to create Air config: %w", err)
+	}
+
+	// Ensure cleanup on exit
+	defer os.Remove(tmpConfigPath)
+
+	// Run Air
+	airCmd := exec.Command("air", "-c", tmpConfigPath)
+	airCmd.Dir = appDir
+	airCmd.Stdout = os.Stdout
+	airCmd.Stderr = os.Stderr
+	airCmd.Stdin = os.Stdin
+
+	if err := airCmd.Run(); err != nil {
+		return fmt.Errorf("failed to run with Air: %w", err)
+	}
+
+	return nil
 }

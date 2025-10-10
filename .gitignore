@@ -5,6 +5,11 @@ bin/
 *.out
 coverage/
 
+# Air (hot-reload)
+tmp/
+app/*/.air.toml
+build-errors.log
+
 # Node / Svelte / Vite (if you add them later)
 node_modules/
 dist/
