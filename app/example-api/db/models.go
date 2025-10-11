@@ -18,6 +18,14 @@ type Post struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type Session struct {
+	ID             string    `json:"id"`
+	UserID         string    `json:"user_id"`
+	CreatedAt      time.Time `json:"created_at"`
+	ExpiresAt      time.Time `json:"expires_at"`
+	LastAccessedAt time.Time `json:"last_accessed_at"`
+}
+
 type User struct {
 	ID           string    `json:"id"`
 	Name         string    `json:"name"`

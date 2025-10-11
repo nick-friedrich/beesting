@@ -10,6 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/handler"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/web"
 )
 
@@ -31,6 +32,9 @@ func main() {
 
 	// Create queries instance
 	queries := db.New(database)
+
+	// Initialize global session manager
+	session.Default = session.NewSessionManager(queries)
 
 	// Setup router
 	r := chi.NewRouter()

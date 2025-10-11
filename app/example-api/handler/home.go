@@ -9,8 +9,7 @@ import (
 
 func Home() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessionManager := session.NewSessionManager()
-		sessionData, _ := sessionManager.GetSession(r)
+		sessionData, _ := session.Default.GetSession(r)
 
 		web.RenderWithLayout(w, "layout.html", "templates/home.html", map[string]any{
 			"Session": sessionData,

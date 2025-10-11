@@ -63,8 +63,7 @@ func validateName(name string) string {
 
 func Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessionManager := session.NewSessionManager()
-		sessionData, _ := sessionManager.GetSession(r)
+		sessionData, _ := session.Default.GetSession(r)
 
 		if sessionData.LoggedIn {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -80,8 +79,7 @@ func Login() http.HandlerFunc {
 
 func Register() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessionManager := session.NewSessionManager()
-		sessionData, _ := sessionManager.GetSession(r)
+		sessionData, _ := session.Default.GetSession(r)
 
 		if sessionData.LoggedIn {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -94,9 +92,7 @@ func Register() http.HandlerFunc {
 
 func LoginSubmit(q *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		sessionManager := session.NewSessionManager()
-		sessionData, _ := sessionManager.GetSession(r)
+		sessionData, _ := session.Default.GetSession(r)
 
 		if sessionData.LoggedIn {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -165,11 +161,10 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 		}
 
 		// Login successful - create session
-		err = sessionManager.SetSession(w, user.ID, user.Email, user.Name)
+		err = session.Default.SetSession(w, user.ID, user.Email, user.Name)
 		if err != nil {
 			fmt.Printf("Session creation error: %v\n", err)
-			sessionManager := session.NewSessionManager()
-			sessionData, _ := sessionManager.GetSession(r)
+			sessionData, _ := session.Default.GetSession(r)
 
 			web.RenderWithLayoutAndSession(w, "layout.html", "templates/auth/login.html", map[string]any{
 				"error": "Login successful but session error. Please try again.",
@@ -185,8 +180,7 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 
 func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessionManager := session.NewSessionManager()
-		sessionData, _ := sessionManager.GetSession(r)
+		sessionData, _ := session.Default.GetSession(r)
 
 		if sessionData.LoggedIn {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -307,8 +301,10 @@ func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 
 func Logout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessionManager := session.NewSessionManager()
-		sessionManager.ClearSession(w)
+		err := session.Default.ClearSession(w, r)
+		if err != nil {
+			fmt.Printf("Logout error: %v\n", err)
+		}
 
 		fmt.Printf("User logged out\n")
 		http.Redirect(w, r, "/", http.StatusSeeOther)

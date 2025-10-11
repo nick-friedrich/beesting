@@ -9,8 +9,7 @@ import (
 
 func NotFound() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessionManager := session.NewSessionManager()
-		sessionData, _ := sessionManager.GetSession(r)
+		sessionData, _ := session.Default.GetSession(r)
 
 		w.WriteHeader(http.StatusNotFound)
 		web.RenderWithLayoutAndSession(w, "layout.html", "templates/404.html", map[string]any{}, sessionData)

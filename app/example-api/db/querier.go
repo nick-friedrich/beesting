@@ -12,16 +12,23 @@ type Querier interface {
 	CountPosts(ctx context.Context) (int64, error)
 	CountPublishedPosts(ctx context.Context) (int64, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteExpiredSessions(ctx context.Context) error
 	DeletePost(ctx context.Context, id int64) error
+	DeleteSession(ctx context.Context, id string) error
+	DeleteUserSessions(ctx context.Context, userID string) error
 	GetPost(ctx context.Context, id int64) (Post, error)
+	GetSession(ctx context.Context, id string) (Session, error)
 	GetUser(ctx context.Context, id string) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserSessions(ctx context.Context, userID string) ([]Session, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListPublishedPosts(ctx context.Context, arg ListPublishedPostsParams) ([]Post, error)
 	PublishPost(ctx context.Context, id int64) error
 	UnpublishPost(ctx context.Context, id int64) error
 	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
+	UpdateSessionAccess(ctx context.Context, id string) error
 }
 
 var _ Querier = (*Queries)(nil)
