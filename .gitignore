@@ -10,6 +10,16 @@ tmp/
 app/*/.air.toml
 build-errors.log
 
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# SQLC generated files (optional - you may want to commit these)
+# app/*/db/db.go
+# app/*/db/models.go
+# app/*/db/queries.sql.go
+
 # Node / Svelte / Vite (if you add them later)
 node_modules/
 dist/

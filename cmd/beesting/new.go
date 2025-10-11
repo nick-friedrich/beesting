@@ -58,19 +58,24 @@ func createFromDefaultTemplate(name string) error {
 	mainGoContent := fmt.Sprintf(`package main
 
 import (
-	"fmt"
-	"log"
 	"net/http"
+
+	"github.com/nick-friedrich/beesting/pkg/beesting"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello from %s!")
+	app := beesting.NewApp()
+
+	// Add middleware
+	app.Use(beesting.Logger())
+	app.Use(beesting.Recovery())
+
+	// Routes
+	app.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello from %s!"))
 	})
 
-	port := ":8080"
-	fmt.Printf("🐝 Server running on http://localhost%%s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	app.Run(":8080")
 }
 `, name)
 
