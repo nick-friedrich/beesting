@@ -35,7 +35,7 @@ func (q *Queries) CountPublishedPosts(ctx context.Context) (int64, error) {
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts (title, content, author, published)
 VALUES (?, ?, ?, ?)
-RETURNING id, title, content, author, published, created_at, updated_at
+RETURNING id, title, slug, content, author, published, created_at, updated_at
 `
 
 type CreatePostParams struct {
@@ -56,6 +56,7 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
+		&i.Slug,
 		&i.Content,
 		&i.Author,
 		&i.Published,
@@ -76,7 +77,7 @@ func (q *Queries) DeletePost(ctx context.Context, id int64) error {
 }
 
 const getPost = `-- name: GetPost :one
-SELECT id, title, content, author, published, created_at, updated_at FROM posts
+SELECT id, title, slug, content, author, published, created_at, updated_at FROM posts
 WHERE id = ?
 LIMIT 1
 `
@@ -87,6 +88,29 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
+		&i.Slug,
+		&i.Content,
+		&i.Author,
+		&i.Published,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getPostBySlug = `-- name: GetPostBySlug :one
+SELECT id, title, slug, content, author, published, created_at, updated_at FROM posts
+WHERE slug = ?
+LIMIT 1
+`
+
+func (q *Queries) GetPostBySlug(ctx context.Context, slug string) (Post, error) {
+	row := q.db.QueryRowContext(ctx, getPostBySlug, slug)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
 		&i.Content,
 		&i.Author,
 		&i.Published,
@@ -97,7 +121,7 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 }
 
 const listPosts = `-- name: ListPosts :many
-SELECT id, title, content, author, published, created_at, updated_at FROM posts
+SELECT id, title, slug, content, author, published, created_at, updated_at FROM posts
 ORDER BY created_at DESC
 LIMIT ? OFFSET ?
 `
@@ -119,6 +143,7 @@ func (q *Queries) ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, e
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
+			&i.Slug,
 			&i.Content,
 			&i.Author,
 			&i.Published,
@@ -139,7 +164,7 @@ func (q *Queries) ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, e
 }
 
 const listPublishedPosts = `-- name: ListPublishedPosts :many
-SELECT id, title, content, author, published, created_at, updated_at FROM posts
+SELECT id, title, slug, content, author, published, created_at, updated_at FROM posts
 WHERE published = 1
 ORDER BY created_at DESC
 LIMIT ? OFFSET ?
@@ -162,6 +187,7 @@ func (q *Queries) ListPublishedPosts(ctx context.Context, arg ListPublishedPosts
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
+			&i.Slug,
 			&i.Content,
 			&i.Author,
 			&i.Published,
@@ -213,7 +239,7 @@ SET title = ?,
     published = ?,
     updated_at = CURRENT_TIMESTAMP
 WHERE id = ?
-RETURNING id, title, content, author, published, created_at, updated_at
+RETURNING id, title, slug, content, author, published, created_at, updated_at
 `
 
 type UpdatePostParams struct {
@@ -236,6 +262,7 @@ func (q *Queries) UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, e
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
+		&i.Slug,
 		&i.Content,
 		&i.Author,
 		&i.Published,

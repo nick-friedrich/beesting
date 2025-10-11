@@ -11,6 +11,7 @@ import (
 type Post struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title"`
+	Slug      string    `json:"slug"`
 	Content   string    `json:"content"`
 	Author    string    `json:"author"`
 	Published bool      `json:"published"`

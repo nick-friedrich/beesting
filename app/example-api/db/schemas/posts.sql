@@ -4,6 +4,7 @@
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
+    slug TEXT NOT NULL,
     content TEXT NOT NULL,
     author TEXT NOT NULL,
     published BOOLEAN NOT NULL DEFAULT 0,
@@ -12,4 +13,5 @@ CREATE TABLE IF NOT EXISTS posts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published);
+CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);

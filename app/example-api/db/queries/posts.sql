@@ -8,6 +8,11 @@ SELECT * FROM posts
 WHERE id = ?
 LIMIT 1;
 
+-- name: GetPostBySlug :one
+SELECT * FROM posts
+WHERE slug = ?
+LIMIT 1;
+
 -- name: ListPosts :many
 SELECT * FROM posts
 ORDER BY created_at DESC

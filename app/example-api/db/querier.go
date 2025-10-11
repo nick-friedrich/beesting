@@ -19,6 +19,7 @@ type Querier interface {
 	DeleteSession(ctx context.Context, id string) error
 	DeleteUserSessions(ctx context.Context, userID string) error
 	GetPost(ctx context.Context, id int64) (Post, error)
+	GetPostBySlug(ctx context.Context, slug string) (Post, error)
 	GetSession(ctx context.Context, id string) (Session, error)
 	GetUser(ctx context.Context, id string) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
