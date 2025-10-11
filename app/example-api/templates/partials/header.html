@@ -24,7 +24,7 @@
         class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-56 p-3 shadow-lg"
       >
         <li><a class="text-base py-2" href="/">Home</a></li>
-        <li><a class="text-base py-2" href="/about">About</a></li>
+        <li><a class="text-base py-2" href="/posts">Posts</a></li>
         <li><a class="text-base py-2" href="/contact">Contact</a></li>
         {{if .Session.LoggedIn}}
         <li><a class="text-base py-2" href="/profile">Profile</a></li>
@@ -42,7 +42,7 @@
   <div class="navbar-center hidden lg:flex">
     <ul class="menu menu-horizontal px-1">
       <li><a class="text-base" href="/">Home</a></li>
-      <li><a class="text-base" href="/about">About</a></li>
+      <li><a class="text-base" href="/posts">Posts</a></li>
       <li><a class="text-base" href="/contact">Contact</a></li>
     </ul>
   </div>
@@ -70,9 +70,9 @@
         tabindex="0"
         class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-52 p-2 shadow-lg"
       >
-        <li><a href="/profile" class="text-base py-2">Profile</a></li>
+        <!-- <li><a href="/profile" class="text-base py-2">Profile</a></li>
         <li><a href="/settings" class="text-base py-2">Settings</a></li>
-        <li><hr class="my-1" /></li>
+        <li><hr class="my-1" /></li> -->
         <li><a href="/logout" class="text-base py-2 text-error">Logout</a></li>
       </ul>
     </div>

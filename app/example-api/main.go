@@ -53,12 +53,17 @@ func main() {
 
 	// Posts routes
 	r.Route("/posts", func(r chi.Router) {
-		r.Get("/", handler.ListPosts(queries))
-		r.Post("/", handler.CreatePost(queries))
-		r.Get("/{id}", handler.GetPost(queries))
-		r.Put("/{id}", handler.UpdatePost(queries))
-		r.Delete("/{id}", handler.DeletePost(queries))
-		r.Post("/{id}/publish", handler.PublishPost(queries))
+		r.Get("/", handler.ShowPosts(queries))
+		r.Get("/{slug}", handler.ShowPost(queries))
+
+		r.Route("/api", func(r chi.Router) {
+			r.Get("/", handler.ListPosts(queries))
+			r.Post("/", handler.CreatePost(queries))
+			r.Get("/{id}", handler.GetPost(queries))
+			r.Put("/{id}", handler.UpdatePost(queries))
+			r.Delete("/{id}", handler.DeletePost(queries))
+			r.Post("/{id}/publish", handler.PublishPost(queries))
+		})
 	})
 
 	// Auth routes
