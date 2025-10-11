@@ -10,9 +10,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/handler"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/web"
 )
 
 func main() {
+	// Load templates
+	web.LoadTemplates()
 	// Initialize database
 	database, err := sql.Open("sqlite3", "./app.db")
 	if err != nil {
@@ -33,9 +36,14 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	// Static files
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+
 	// Routes
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Posts API - Visit /posts"))
+	r.Get("/", handler.Home())
+
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("OK"))
 	})
 
 	// Posts routes

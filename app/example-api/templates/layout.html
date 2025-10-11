@@ -1,0 +1,17 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{block "title" .}}BeeSting App{{end}}</title>
+    <link href="/static/output.css" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen bg-base-200 flex flex-col">
+    {{template "header" .}}
+    <main class="container mx-auto p-6 flex-1">
+      {{block "content" .}}{{end}}
+    </main>
+    {{template "footer" .}}
+  </body>
+</html>
+{{end}}
