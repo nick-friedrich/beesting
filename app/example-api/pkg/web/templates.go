@@ -62,3 +62,29 @@ func Render(w http.ResponseWriter, name string, data any) {
 		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
 	}
 }
+
+// RenderWithLayout renders a page template within a layout
+func RenderWithLayout(w http.ResponseWriter, layoutName string, pagePath string, data any) {
+	// Parse layout and partials first
+	layoutTemplate, err := template.ParseFiles("templates/layout.html", "templates/partials/header.html", "templates/partials/footer.html")
+	if err != nil {
+		log.Printf("Template error: %v", err)
+		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Clone and add the page template (which defines the content blocks)
+	pageTemplate, err := template.Must(layoutTemplate.Clone()).ParseFiles(pagePath)
+	if err != nil {
+		log.Printf("Template error: %v", err)
+		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Rendering template: %s with layout: %s", pagePath, layoutName)
+	err = pageTemplate.ExecuteTemplate(w, layoutName, data)
+	if err != nil {
+		log.Printf("Template error: %v", err)
+		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
+	}
+}

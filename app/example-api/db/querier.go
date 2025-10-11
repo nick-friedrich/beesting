@@ -12,8 +12,11 @@ type Querier interface {
 	CountPosts(ctx context.Context) (int64, error)
 	CountPublishedPosts(ctx context.Context) (int64, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeletePost(ctx context.Context, id int64) error
 	GetPost(ctx context.Context, id int64) (Post, error)
+	GetUser(ctx context.Context, id string) (User, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
 	ListPosts(ctx context.Context, arg ListPostsParams) ([]Post, error)
 	ListPublishedPosts(ctx context.Context, arg ListPublishedPostsParams) ([]Post, error)
 	PublishPost(ctx context.Context, id int64) error

@@ -57,6 +57,15 @@ func main() {
 		r.Post("/{id}/publish", handler.PublishPost(queries))
 	})
 
+	// Auth routes
+	r.Get("/login", handler.Login())
+	r.Get("/register", handler.Register())
+	r.Post("/login", handler.LoginSubmit(queries))
+	r.Post("/register", handler.RegisterSubmit(queries))
+
+	// 404 handler for unmatched routes
+	r.NotFound(handler.NotFound())
+
 	log.Println("🐝 Server running on http://localhost:3000")
 	http.ListenAndServe(":3000", r)
 }

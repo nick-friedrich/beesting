@@ -1,0 +1,52 @@
+{{define "title"}}Login{{end}} {{define "content"}}
+<div class="text-center mx-auto flex flex-col items-center justify-center">
+  <h1 class="text-3xl font-bold mb-4">Login</h1>
+  <p class="text-gray-600">Login to your account to continue.</p>
+  <form method="post">
+    <fieldset
+      class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
+    >
+      <legend class="fieldset-legend">Login</legend>
+
+      {{if .error}}
+      <div class="alert alert-error alert-soft">
+        <span>{{.error}}</span>
+      </div>
+      {{end}} {{if .registered}}
+      <div class="alert alert-success alert-soft">
+        <span
+          >Registration successful! Please log in with your credentials.</span
+        >
+      </div>
+      {{end}}
+
+      <label class="label">Email</label>
+      <input
+        name="email"
+        type="email"
+        class="input {{if .errors.Email}}input-error{{end}}"
+        placeholder="Email"
+        value="{{.email}}"
+      />
+      {{if .errors.Email}}
+      <div class="text-error text-sm mt-1">{{.errors.Email}}</div>
+      {{end}}
+
+      <label class="label">Password</label>
+      <input
+        name="password"
+        type="password"
+        class="input {{if .errors.Password}}input-error{{end}}"
+        placeholder="Password"
+      />
+      {{if .errors.Password}}
+      <div class="text-error text-sm mt-1">{{.errors.Password}}</div>
+      {{end}}
+
+      <a href="/register" class="link">Don't have an account? Register</a>
+
+      <button class="btn btn-neutral mt-4">Login</button>
+    </fieldset>
+  </form>
+</div>
+{{end}}

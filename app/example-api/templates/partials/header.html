@@ -1,13 +1,46 @@
 {{define "header"}}
-<nav class="navbar bg-base-100 shadow">
-  <div class="flex-1 px-2">
-    <a href="/" class="text-xl font-bold text-primary">BeeSting</a>
+
+<div class="navbar bg-base-300 shadow-sm px-4">
+  <div class="navbar-start">
+    <div class="dropdown">
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h8m-8 6h16"
+          />
+        </svg>
+      </div>
+      <ul
+        tabindex="-1"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-56 p-3 shadow-lg"
+      >
+        <li><a class="text-base py-2" href="/">Home</a></li>
+        <li><a class="text-base py-2" href="/about">About</a></li>
+        <li><a class="text-base py-2" href="/contact">Contact</a></li>
+        <li><a class="text-base py-2" href="/login">Login</a></li>
+      </ul>
+    </div>
+    <a class="btn btn-ghost text-xl sm:text-2xl font-bold">BeeSting</a>
   </div>
-  <div class="flex-none">
-    <ul class="flex flex-row gap-2 px-1">
-      <li><a href="/">Home</a></li>
-      <li><a href="/posts">Posts</a></li>
+  <div class="navbar-center hidden lg:flex">
+    <ul class="menu menu-horizontal px-1">
+      <li><a class="text-base" href="/">Home</a></li>
+      <li><a class="text-base" href="/about">About</a></li>
+      <li><a class="text-base" href="/contact">Contact</a></li>
     </ul>
   </div>
-</nav>
+  <div class="navbar-end">
+    <a class="btn btn-primary hidden sm:inline-flex" href="/login">Login</a>
+  </div>
+</div>
+
 {{end}}
