@@ -3,8 +3,11 @@ package web
 import (
 	"fmt"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -17,8 +20,29 @@ var (
 // LoadTemplates initializes the template cache once
 func LoadTemplates() {
 	once.Do(func() {
-		templates = template.Must(template.New("").ParseGlob("templates/*.html"))
-		templates = template.Must(templates.ParseGlob("templates/partials/*.html"))
+		templates = template.New("")
+
+		// Walk the templates directory recursively
+		err := filepath.WalkDir("templates", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			// Only process .html files
+			if !d.IsDir() && strings.HasSuffix(path, ".html") {
+				_, err := templates.ParseFiles(path)
+				if err != nil {
+					log.Printf("Error parsing template %s: %v", path, err)
+					return err
+				}
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			log.Fatalf("Error loading templates: %v", err)
+		}
 
 		// Debug: list loaded templates
 		log.Printf("Loaded templates: %v", templates.DefinedTemplates())
