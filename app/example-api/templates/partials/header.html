@@ -26,10 +26,18 @@
         <li><a class="text-base py-2" href="/">Home</a></li>
         <li><a class="text-base py-2" href="/about">About</a></li>
         <li><a class="text-base py-2" href="/contact">Contact</a></li>
+        {{if .Session.LoggedIn}}
+        <li><a class="text-base py-2" href="/profile">Profile</a></li>
+        <li><a class="text-base py-2" href="/settings">Settings</a></li>
+        <li><hr class="my-1" /></li>
+        <li><a class="text-base py-2 text-error" href="/logout">Logout</a></li>
+        {{else}}
         <li><a class="text-base py-2" href="/login">Login</a></li>
+        <li><a class="text-base py-2" href="/register">Sign Up</a></li>
+        {{end}}
       </ul>
     </div>
-    <a class="btn btn-ghost text-xl sm:text-2xl font-bold">BeeSting</a>
+    <a class="btn btn-ghost text-xl sm:text-2xl font-bold" href="/">BeeSting</a>
   </div>
   <div class="navbar-center hidden lg:flex">
     <ul class="menu menu-horizontal px-1">
@@ -39,7 +47,38 @@
     </ul>
   </div>
   <div class="navbar-end">
+    {{if .Session.LoggedIn}}
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-ghost">
+        <span class="hidden sm:inline">{{.Session.Name}}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+      <ul
+        tabindex="0"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-52 p-2 shadow-lg"
+      >
+        <li><a href="/profile" class="text-base py-2">Profile</a></li>
+        <li><a href="/settings" class="text-base py-2">Settings</a></li>
+        <li><hr class="my-1" /></li>
+        <li><a href="/logout" class="text-base py-2 text-error">Logout</a></li>
+      </ul>
+    </div>
+    {{else}}
     <a class="btn btn-primary hidden sm:inline-flex" href="/login">Login</a>
+    {{end}}
   </div>
 </div>
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	passwordPkg "github.com/nick-friedrich/beesting/app/example-api/pkg/password"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/web"
 	"github.com/oklog/ulid/v2"
 )
@@ -62,21 +63,46 @@ func validateName(name string) string {
 
 func Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		sessionManager := session.NewSessionManager()
+		sessionData, _ := sessionManager.GetSession(r)
+
+		if sessionData.LoggedIn {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
 		registered := r.URL.Query().Get("registered") == "true"
-		web.RenderWithLayout(w, "layout.html", "templates/auth/login.html", map[string]any{
+		web.RenderWithLayoutAndSession(w, "layout.html", "templates/auth/login.html", map[string]any{
 			"registered": registered,
-		})
+		}, sessionData)
 	}
 }
 
 func Register() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		web.RenderWithLayout(w, "layout.html", "templates/auth/register.html", map[string]any{})
+		sessionManager := session.NewSessionManager()
+		sessionData, _ := sessionManager.GetSession(r)
+
+		if sessionData.LoggedIn {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		web.RenderWithLayoutAndSession(w, "layout.html", "templates/auth/register.html", map[string]any{}, sessionData)
 	}
 }
 
 func LoginSubmit(q *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		sessionManager := session.NewSessionManager()
+		sessionData, _ := sessionManager.GetSession(r)
+
+		if sessionData.LoggedIn {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
 		var errors ValidationErrors
 		var hasErrors bool = false
 
@@ -98,6 +124,7 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 
 		// If there are validation errors, show the form again
 		if hasErrors {
+
 			web.RenderWithLayout(w, "layout.html", "templates/auth/login.html", map[string]any{
 				"errors": errors,
 				"email":  email, // Preserve email value
@@ -137,17 +164,35 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 			return
 		}
 
-		// Login successful
-		fmt.Printf("Login successful: user_id=%s, email=%s\n", user.ID, email)
+		// Login successful - create session
+		err = sessionManager.SetSession(w, user.ID, user.Email, user.Name)
+		if err != nil {
+			fmt.Printf("Session creation error: %v\n", err)
+			sessionManager := session.NewSessionManager()
+			sessionData, _ := sessionManager.GetSession(r)
 
-		// TODO: Set session/cookie here
-		// For now, just redirect to home
+			web.RenderWithLayoutAndSession(w, "layout.html", "templates/auth/login.html", map[string]any{
+				"error": "Login successful but session error. Please try again.",
+				"email": email,
+			}, sessionData)
+			return
+		}
+
+		fmt.Printf("Login successful: user_id=%s, email=%s\n", user.ID, email)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
 
 func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		sessionManager := session.NewSessionManager()
+		sessionData, _ := sessionManager.GetSession(r)
+
+		if sessionData.LoggedIn {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
 		var errors ValidationErrors
 		var hasErrors bool = false
 
@@ -257,5 +302,15 @@ func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 
 		// Simulate successful registration
 		http.Redirect(w, r, "/login?registered=true", http.StatusSeeOther)
+	}
+}
+
+func Logout() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sessionManager := session.NewSessionManager()
+		sessionManager.ClearSession(w)
+
+		fmt.Printf("User logged out\n")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }

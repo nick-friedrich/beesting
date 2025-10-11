@@ -65,6 +65,11 @@ func Render(w http.ResponseWriter, name string, data any) {
 
 // RenderWithLayout renders a page template within a layout
 func RenderWithLayout(w http.ResponseWriter, layoutName string, pagePath string, data any) {
+	RenderWithLayoutAndSession(w, layoutName, pagePath, data, nil)
+}
+
+// RenderWithLayoutAndSession renders a page template within a layout with session data
+func RenderWithLayoutAndSession(w http.ResponseWriter, layoutName string, pagePath string, data any, sessionData any) {
 	// Parse layout and partials first
 	layoutTemplate, err := template.ParseFiles("templates/layout.html", "templates/partials/header.html", "templates/partials/footer.html")
 	if err != nil {
@@ -81,8 +86,21 @@ func RenderWithLayout(w http.ResponseWriter, layoutName string, pagePath string,
 		return
 	}
 
+	// Merge data with session data
+	templateData := make(map[string]any)
+	if data != nil {
+		if dataMap, ok := data.(map[string]any); ok {
+			for k, v := range dataMap {
+				templateData[k] = v
+			}
+		}
+	}
+	if sessionData != nil {
+		templateData["Session"] = sessionData
+	}
+
 	log.Printf("Rendering template: %s with layout: %s", pagePath, layoutName)
-	err = pageTemplate.ExecuteTemplate(w, layoutName, data)
+	err = pageTemplate.ExecuteTemplate(w, layoutName, templateData)
 	if err != nil {
 		log.Printf("Template error: %v", err)
 		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)

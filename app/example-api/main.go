@@ -62,6 +62,7 @@ func main() {
 	r.Get("/register", handler.Register())
 	r.Post("/login", handler.LoginSubmit(queries))
 	r.Post("/register", handler.RegisterSubmit(queries))
+	r.Get("/logout", handler.Logout())
 
 	// 404 handler for unmatched routes
 	r.NotFound(handler.NotFound())
