@@ -18,6 +18,7 @@ type SessionData struct {
 	Email    string
 	Name     string
 	LoggedIn bool
+	UserRole string
 }
 
 // SessionManager handles session operations
@@ -113,6 +114,7 @@ func (sm *SessionManager) GetSession(r *http.Request) (*SessionData, error) {
 
 	return &SessionData{
 		UserID:   user.ID,
+		UserRole: user.Role,
 		Email:    user.Email,
 		Name:     user.Name,
 		LoggedIn: true,
