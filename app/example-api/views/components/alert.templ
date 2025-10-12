@@ -1,7 +1,21 @@
 package views
 
 templ Alert(alertType string, message string) {
-	<div class="alert alert-{ alertType } alert-soft">
-		<span>{ message }</span>
-	</div>
+	if alertType == "error" {
+		<div class="alert alert-error alert-soft">
+			<span>{ message }</span>
+		</div>
+	} else if alertType == "success" {
+		<div class="alert alert-success alert-soft">
+			<span>{ message }</span>
+		</div>
+	} else if alertType == "warning" {
+		<div class="alert alert-warning alert-soft">
+			<span>{ message }</span>
+		</div>
+	} else if alertType == "info" {
+		<div class="alert alert-info alert-soft">
+			<span>{ message }</span>
+		</div>
+	}
 }

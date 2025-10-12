@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/web"
+	"github.com/nick-friedrich/beesting/app/example-api/views"
 )
 
 func NotFound() http.HandlerFunc {
@@ -12,6 +12,11 @@ func NotFound() http.HandlerFunc {
 		sessionData, _ := session.Default.GetSession(r)
 
 		w.WriteHeader(http.StatusNotFound)
-		web.RenderWithLayoutAndSession(w, "layout.html", "templates/404.html", map[string]any{}, sessionData)
+		views.Layout(
+			views.NotFound(),
+			sessionData,
+			"Not found",
+		).Render(r.Context(), w)
+
 	}
 }

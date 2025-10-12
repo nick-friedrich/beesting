@@ -8,7 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/web"
+	"github.com/nick-friedrich/beesting/app/example-api/views"
+	postviews "github.com/nick-friedrich/beesting/app/example-api/views/posts"
 )
 
 func ShowPosts(q *db.Queries) http.HandlerFunc {
@@ -24,9 +25,7 @@ func ShowPosts(q *db.Queries) http.HandlerFunc {
 		}
 
 		sessionData, _ := session.Default.GetSession(r)
-		web.RenderWithLayoutAndSession(w, "layout.html", "templates/posts/index.html", map[string]any{
-			"Posts": posts,
-		}, sessionData)
+		views.Layout(postviews.Index(posts), sessionData, "Posts").Render(r.Context(), w)
 	}
 }
 
@@ -39,9 +38,7 @@ func ShowPost(q *db.Queries) http.HandlerFunc {
 		}
 
 		sessionData, _ := session.Default.GetSession(r)
-		web.RenderWithLayoutAndSession(w, "layout.html", "templates/posts/show.html", map[string]any{
-			"Post": post,
-		}, sessionData)
+		views.Layout(postviews.Show(post), sessionData, "Post").Render(r.Context(), w)
 	}
 }
 
@@ -53,7 +50,7 @@ func CreatePostShow() http.HandlerFunc {
 			return
 		}
 
-		web.RenderWithLayoutAndSession(w, "layout.html", "templates/posts/new_post.html", map[string]any{}, sessionData)
+		views.Layout(postviews.New(), sessionData, "New Post").Render(r.Context(), w)
 	}
 }
 

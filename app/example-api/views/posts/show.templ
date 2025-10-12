@@ -1,0 +1,15 @@
+package postviews
+
+import "github.com/nick-friedrich/beesting/app/example-api/db"
+
+templ Show(post db.Post) {
+	<div class="text-center mx-auto flex flex-col items-center justify-center">
+		<h1 class="text-3xl font-bold mb-4">{ post.Title }</h1>
+		<div class="flex flex-col gap-2 text-gray-600">
+			<span>{ post.Author }</span>
+			<span>{ post.CreatedAt.String() }</span>
+			<span>{ post.UpdatedAt.String() }</span>
+		</div>
+		<p class="text-primary">{ post.Content }</p>
+	</div>
+}

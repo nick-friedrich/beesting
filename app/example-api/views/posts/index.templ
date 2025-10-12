@@ -1,0 +1,20 @@
+package postviews
+
+import "github.com/nick-friedrich/beesting/app/example-api/db"
+import "fmt"
+
+func genHref(slug string) string {
+	return fmt.Sprintf("/posts/%s", slug)
+}
+
+templ Index(posts []db.Post) {
+	<div class="text-center mx-auto flex flex-col items-center justify-center">
+		<h1 class="text-3xl font-bold mb-4">Posts</h1>
+		<p class="text-gray-600">Posts page.</p>
+		<ul>
+			for _, post := range posts {
+				<li><a href={ genHref(post.Slug) }>{ post.Title }</a></li>
+			}
+		</ul>
+	</div>
+}

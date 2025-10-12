@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/web"
+	"github.com/nick-friedrich/beesting/app/example-api/views"
 )
 
 func Error(error string) http.HandlerFunc {
@@ -12,8 +12,11 @@ func Error(error string) http.HandlerFunc {
 		sessionData, _ := session.Default.GetSession(r)
 
 		w.WriteHeader(http.StatusInternalServerError)
-		web.RenderWithLayoutAndSession(w, "layout.html", "templates/error.html", map[string]any{
-			"error": error,
-		}, sessionData)
+		views.Layout(
+			views.ErrorView(error),
+			sessionData,
+			"Oops. Something went wrong",
+		).Render(r.Context(), w)
+
 	}
 }
