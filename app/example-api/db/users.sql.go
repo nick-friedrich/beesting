@@ -12,7 +12,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, name, email, password_hash)
 VALUES (?, ?, ?, ?)
-RETURNING id, name, email, password_hash, created_at, updated_at
+RETURNING id, name, email, password_hash, role, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -35,6 +35,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -42,7 +43,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, name, email, password_hash, created_at, updated_at FROM users
+SELECT id, name, email, password_hash, role, created_at, updated_at FROM users
 WHERE id = ?
 LIMIT 1
 `
@@ -55,6 +56,7 @@ func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 		&i.Name,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -62,7 +64,7 @@ func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, password_hash, created_at, updated_at FROM users
+SELECT id, name, email, password_hash, role, created_at, updated_at FROM users
 WHERE email = ?
 LIMIT 1
 `
@@ -75,6 +77,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Name,
 		&i.Email,
 		&i.PasswordHash,
+		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
