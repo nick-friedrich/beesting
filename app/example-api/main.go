@@ -1,12 +1,14 @@
 package main
 
 import (
+	"crypto/rand"
 	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/gorilla/csrf"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/handler"
@@ -33,17 +35,24 @@ func main() {
 	// Initialize global session manager
 	session.Default = session.NewSessionManager(queries)
 
+	// Generate CSRF key
+	csrfKey := make([]byte, 32)
+	if _, err := rand.Read(csrfKey); err != nil {
+		log.Fatal("Failed to generate CSRF key:", err)
+	}
+
 	// Setup router
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	// Static files
+	// Routes with CSRF protection
+	r.Use(csrf.Protect(csrfKey, csrf.TrustedOrigins([]string{"localhost:3000"}), csrf.FieldName("_csrf")))
+
+	// Static files (no CSRF needed)
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
-	// Routes
 	r.Get("/", handler.Home())
-
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
 	})

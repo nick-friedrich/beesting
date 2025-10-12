@@ -5,7 +5,7 @@ import "github.com/nick-friedrich/beesting/app/example-api/pkg/session"
 
 templ Layout(contents templ.Component, session *session.SessionData, title string) {
 	<!DOCTYPE html>
-	<html lang="en" data-theme="light">
+	<html lang="en" data-theme="winter">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -23,7 +23,7 @@ templ Layout(contents templ.Component, session *session.SessionData, title strin
 }
 
 templ header(session *session.SessionData) {
-	<div class="navbar bg-base-300 shadow-sm px-4">
+	<div class="navbar bg-base-100/50 backdrop-blur-sm shadow-sm px-4">
 		<div class="navbar-start">
 			<div class="dropdown">
 				<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -107,7 +107,7 @@ templ header(session *session.SessionData) {
 }
 
 templ footer() {
-	<footer class="footer bg-base-300 px-4 py-6 sm:px-6 lg:px-8 text-center">
+	<footer class="footer bg-base-300/20 px-4 py-6 sm:px-6 lg:px-8 text-center">
 		<p class="text-sm sm:text-base">© 2025 BeeSting Starter</p>
 	</footer>
 }

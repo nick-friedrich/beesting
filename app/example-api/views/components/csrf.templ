@@ -1,0 +1,10 @@
+package components
+
+import "net/http"
+
+templ CSRF(r *http.Request) {
+	{{ token := r.Context().Value("gorilla.csrf.Token") }}
+	if token != nil {
+		<input type="hidden" name="_csrf" value={ token.(string) }/>
+	}
+}

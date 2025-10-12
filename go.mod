@@ -7,6 +7,8 @@ require github.com/spf13/cobra v1.10.1
 require (
 	github.com/a-h/templ v0.3.943 // indirect
 	github.com/go-chi/chi/v5 v5.2.3 // indirect
+	github.com/gorilla/csrf v1.7.3 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
