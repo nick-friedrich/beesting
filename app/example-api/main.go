@@ -11,12 +11,9 @@ import (
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/handler"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/web"
 )
 
 func main() {
-	// Load templates
-	web.LoadTemplates()
 
 	// Initialize database
 	database, err := sql.Open("sqlite3", "./app.db")
