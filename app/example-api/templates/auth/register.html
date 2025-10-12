@@ -1,66 +1,62 @@
-{{define "title"}}Sign up{{end}} {{define "content"}}
-<div class="text-center mx-auto flex flex-col items-center justify-center">
-  <h1 class="text-3xl font-bold mb-4">Sign up</h1>
-  <p class="text-gray-600">Create an account to continue.</p>
-  <form method="post">
-    <fieldset
-      class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
-    >
-      <legend class="fieldset-legend">Sign up</legend>
+{{ define "title" }}Sign up{{ end }}
+{{ define "content" }}
+  <div class="mx-auto flex flex-col items-center justify-center">
+    <h1 class="text-3xl font-bold mb-4">Sign up</h1>
+    <p class="text-gray-600">Create an account to continue.</p>
+    <form method="post">
+      <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+        <legend class="fieldset-legend">Sign up</legend>
 
-      {{if .errors.General}}
-      <div class="alert alert-error alert-soft">
-        <span>{{.errors.General}}</span>
-      </div>
-      {{end}}
+        {{ if .errors.General }}
+          {{ template "alert_error" .errors.General }}
+        {{ end }}
 
-      <label class="label">Name</label>
-      <input
-        name="name"
-        type="text"
-        class="input {{if .errors.Name}}input-error{{end}}"
-        placeholder="Name"
-        value="{{.name}}"
-      />
-      {{if .errors.Name}}
-      <div class="text-error text-sm mt-1">{{.errors.Name}}</div>
-      {{end}}
 
-      <label class="label">Email</label>
-      <input
-        name="email"
-        type="email"
-        class="input {{if .errors.Email}}input-error{{end}}"
-        placeholder="Email"
-        value="{{.email}}"
-      />
-      {{if .errors.Email}}
-      <div class="text-error text-sm mt-1">{{.errors.Email}}</div>
-      {{end}}
+        <label class="label">Name</label>
+        <input
+          name="name"
+          type="text"
+          class="input {{ if .errors.Name }}input-error{{ end }}"
+          placeholder="Name"
+          value="{{ .name }}"
+        />
+        {{ if .errors.Name }}
+          <div class="text-error text-sm mt-1">{{ .errors.Name }}</div>
+        {{ end }}
 
-      <label class="label">Password</label>
-      <input
-        name="password"
-        type="password"
-        class="input {{if .errors.Password}}input-error{{end}}"
-        placeholder="Password"
-      />
-      {{if .errors.Password}}
-      <div class="text-error text-sm mt-1">{{.errors.Password}}</div>
-      {{end}}
 
-      <label class="label">Confirm Password</label>
-      <input
-        name="confirm_password"
-        type="password"
-        class="input"
-        placeholder="Confirm Password"
-      />
+        <label class="label">Email</label>
+        <input
+          name="email"
+          type="email"
+          class="input {{ if .errors.Email }}input-error{{ end }}"
+          placeholder="Email"
+          value="{{ .email }}"
+        />
+        {{ if .errors.Email }}
+          <div class="text-error text-sm mt-1">{{ .errors.Email }}</div>
+        {{ end }}
 
-      <a href="/login" class="link">Already have an account? Login</a>
 
-      <button class="btn btn-neutral mt-4">Sign up</button>
-    </fieldset>
-  </form>
-</div>
-{{end}}
+        <label class="label">Password</label>
+        <input
+          name="password"
+          type="password"
+          class="input {{ if .errors.Password }}input-error{{ end }}"
+          placeholder="Password"
+        />
+        {{ if .errors.Password }}
+          <div class="text-error text-sm mt-1">{{ .errors.Password }}</div>
+        {{ end }}
+
+
+        <label class="label">Confirm Password</label>
+        <input name="confirm_password" type="password" class="input" placeholder="Confirm Password" />
+
+        <a href="/login" class="link">Already have an account? Login</a>
+
+        <button class="btn btn-neutral mt-4">Sign up</button>
+      </fieldset>
+    </form>
+  </div>
+{{ end }}

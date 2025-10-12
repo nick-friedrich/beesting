@@ -70,8 +70,30 @@ func RenderWithLayout(w http.ResponseWriter, layoutName string, pagePath string,
 
 // RenderWithLayoutAndSession renders a page template within a layout with session data
 func RenderWithLayoutAndSession(w http.ResponseWriter, layoutName string, pagePath string, data any, sessionData any) {
-	// Parse layout and partials first
-	layoutTemplate, err := template.ParseFiles("templates/layout.html", "templates/partials/header.html", "templates/partials/footer.html")
+	// Collect all template files dynamically
+	var templateFiles []string
+
+	err := filepath.WalkDir("templates", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Only process .html files
+		if !d.IsDir() && strings.HasSuffix(path, ".html") {
+			templateFiles = append(templateFiles, path)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Printf("Template error: %v", err)
+		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Parse all templates
+	layoutTemplate, err := template.ParseFiles(templateFiles...)
 	if err != nil {
 		log.Printf("Template error: %v", err)
 		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
