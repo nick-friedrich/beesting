@@ -36,6 +36,16 @@ var devCmd = &cobra.Command{
 			return fmt.Errorf("failed to get absolute path: %w", err)
 		}
 
+		// Run templ generate
+		templCmd := exec.Command("templ", "generate", absAppDir)
+		templCmd.Stdout = os.Stdout
+		templCmd.Stderr = os.Stderr
+		templCmd.Stdin = os.Stdin
+
+		if err := templCmd.Run(); err != nil {
+			return fmt.Errorf("failed to run templ generate: %w", err)
+		}
+
 		// Check if Air is installed
 		if isAirInstalled() {
 			return runWithAir(name, absAppDir)
@@ -74,11 +84,11 @@ tmp_dir = "%s/tmp"
 
 [build]
   bin = "%s/tmp/main"
-  cmd = "go build -o %s/tmp/main %s"
+  cmd = "templ generate && go build -o %s/tmp/main %s"
   delay = 1000
   exclude_dir = ["tmp", "node_modules"]
-  exclude_regex = ["_test.go"]
-  include_ext = ["go", "tpl", "tmpl", "html"]
+  exclude_regex = ["_test.go", "_templ.go"]
+  include_ext = ["go", "tpl", "tmpl", "html", "templ"]
   kill_delay = "500ms"
   rerun = false
   rerun_delay = 500

@@ -1,0 +1,32 @@
+package views
+
+import "github.com/nick-friedrich/beesting/app/example-api/pkg/session"
+
+templ Home(session *session.SessionData) {
+	<div class="text-center sm:text-left">
+		if session.LoggedIn {
+			<h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
+				Welcome back, { session.Name }!
+			</h1>
+			<p class="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
+				You are logged in as { session.Email }. Ready to get started?
+			</p>
+		} else {
+			<h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
+				Welcome to BeeSting Starter
+			</h1>
+			<p class="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
+				This is rendered using Go templates, Tailwind, and DaisyUI.
+			</p>
+		}
+		<div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
+			if session.LoggedIn {
+				<a href="/logout" class="btn btn-outline btn-lg">Logout</a>
+				<button class="btn btn-primary btn-lg">Dashboard</button>
+			} else {
+				<a href="/login" class="btn btn-primary btn-lg">Login</a>
+				<a href="/register" class="btn btn-outline btn-lg">Sign Up</a>
+			}
+		</div>
+	</div>
+}

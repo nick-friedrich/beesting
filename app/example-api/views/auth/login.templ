@@ -1,0 +1,55 @@
+package authviews
+
+import (
+	"github.com/nick-friedrich/beesting/app/example-api/types"
+	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
+)
+
+templ Login(errors types.AuthValidationErrors, email string, registered bool) {
+	<div class="mx-auto flex flex-col items-center justify-center">
+		<h1 class="text-3xl font-bold mb-4">Sign in to your account</h1>
+		<p class="text-gray-600">Login to your account to continue.</p>
+		<form method="post">
+			<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+				<legend class="fieldset-legend">Login</legend>
+				if errors.General != "" {
+					@components.Alert("error", errors.General)
+				}
+				if registered {
+					@components.Alert("success", "Registration successful! Please log in with your credentials.")
+				}
+				<label class="label">Email</label>
+				<input
+					name="email"
+					type="email"
+					if errors.Email != "" {
+						class="input input-error"
+					} else {
+						class="input"
+					}
+					placeholder="Email"
+					value={ email }
+				/>
+				if errors.Email != "" {
+					<div class="text-error text-sm">{ errors.Email }</div>
+				}
+				<label class="label">Password</label>
+				<input
+					name="password"
+					type="password"
+					if errors.Password != "" {
+						class="input input-error"
+					} else {
+						class="input"
+					}
+					placeholder="Password"
+				/>
+				if errors.Password != "" {
+					<div class="text-error text-sm mt-1">{ errors.Password }</div>
+				}
+				<a href="/register" class="link">Don't have an account? Register</a>
+				<button class="btn btn-neutral mt-4">Login</button>
+			</fieldset>
+		</form>
+	</div>
+}
