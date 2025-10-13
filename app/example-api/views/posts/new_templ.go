@@ -8,7 +8,13 @@ package postviews
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func New() templ.Component {
+import (
+	"net/http"
+
+	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
+)
+
+func New(r *http.Request) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +35,41 @@ func New() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"text-center mx-auto flex flex-col items-center justify-center\"><form method=\"post\"><input type=\"text\" name=\"title\" placeholder=\"Title\" class=\"input\"> <input type=\"text\" name=\"content\" placeholder=\"Content\" class=\"input\"> <input type=\"text\" name=\"author\" placeholder=\"Author\" class=\"input\"> <input type=\"checkbox\" name=\"published\" checked> <button type=\"submit\" class=\"btn btn-primary\">Create Post</button></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-2xl mx-auto\"><div class=\"mb-6\"><a href=\"/posts\" class=\"btn btn-ghost btn-sm mb-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15 19l-7-7 7-7\"></path></svg> Back to Posts</a></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<form method=\"post\" class=\"space-y-6\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.CSRF(r).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"form-control\"><label class=\"label\"><span class=\"label-text font-medium\">Post Title</span></label> <input name=\"title\" id=\"title\" type=\"text\" class=\"input input-bordered w-full\" placeholder=\"Enter a compelling title for your post\" required></div><div class=\"form-control\"><label class=\"label\"><span class=\"label-text font-medium\">URL Slug</span></label> <input name=\"slug\" id=\"slug\" type=\"text\" class=\"input input-bordered w-full\" placeholder=\"url-friendly-slug\" required> <label class=\"label\"><span class=\"label-text-alt\">This will be used in the URL. Only lowercase letters, numbers, and hyphens allowed.</span></label></div><div class=\"form-control\"><label class=\"label\"><span class=\"label-text font-medium\">Author</span></label> <input name=\"author\" type=\"text\" class=\"input input-bordered w-full\" placeholder=\"Enter the author's name\" required></div><div class=\"form-control\"><label class=\"label\"><span class=\"label-text font-medium\">Content</span></label> <textarea name=\"content\" class=\"textarea textarea-bordered w-full h-64\" placeholder=\"Write your post content here...\" required></textarea></div><div class=\"form-control\"><label class=\"cursor-pointer label\"><span class=\"label-text font-medium\">Publish immediately</span> <input name=\"published\" type=\"checkbox\" class=\"checkbox checkbox-primary\" checked></label> <label class=\"label\"><span class=\"label-text-alt\">Uncheck to save as draft</span></label></div><div class=\"form-control mt-8\"><div class=\"flex gap-3\"><button type=\"submit\" class=\"btn btn-primary flex-1\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> Create Post</button> <a href=\"/posts\" class=\"btn btn-outline\">Cancel</a></div></div></form>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = components.Card("Create New Post").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><script>\n\t\tfunction slugify(text) {\n\t\t\treturn text\n\t\t\t\t.toLowerCase()\n\t\t\t\t.trim()\n\t\t\t\t.replace(/[^\\w\\s-]/g, '') // Remove special characters\n\t\t\t\t.replace(/[\\s_-]+/g, '-') // Replace spaces and underscores with hyphens\n\t\t\t\t.replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens\n\t\t}\n\t\t\n\t\tfunction validateSlug(slug) {\n\t\t\treturn /^[a-z0-9-]+$/.test(slug) && !slug.startsWith('-') && !slug.endsWith('-');\n\t\t}\n\t\t\n\t\tdocument.addEventListener('DOMContentLoaded', function() {\n\t\t\tconst titleInput = document.getElementById('title');\n\t\t\tconst slugInput = document.getElementById('slug');\n\t\t\t\n\t\t\ttitleInput.addEventListener('input', function() {\n\t\t\t\tif (slugInput.value === '' || slugInput.dataset.autoGenerated === 'true') {\n\t\t\t\t\tconst slug = slugify(this.value);\n\t\t\t\t\tslugInput.value = slug;\n\t\t\t\t\tslugInput.dataset.autoGenerated = 'true';\n\t\t\t\t\tupdateSlugValidation();\n\t\t\t\t}\n\t\t\t});\n\t\t\t\n\t\t\tslugInput.addEventListener('input', function() {\n\t\t\t\tthis.dataset.autoGenerated = 'false';\n\t\t\t\tupdateSlugValidation();\n\t\t\t});\n\t\t\t\n\t\t\tfunction updateSlugValidation() {\n\t\t\t\tconst slug = slugInput.value;\n\t\t\t\tconst isValid = validateSlug(slug);\n\t\t\t\t\n\t\t\t\tif (slugInput.value !== '') {\n\t\t\t\t\tif (isValid) {\n\t\t\t\t\t\tslugInput.classList.remove('input-error');\n\t\t\t\t\t\tslugInput.classList.add('input-success');\n\t\t\t\t\t} else {\n\t\t\t\t\t\tslugInput.classList.remove('input-success');\n\t\t\t\t\t\tslugInput.classList.add('input-error');\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tslugInput.classList.remove('input-error', 'input-success');\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

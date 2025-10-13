@@ -1,20 +1,94 @@
 package postviews
 
-import "github.com/nick-friedrich/beesting/app/example-api/db"
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/nick-friedrich/beesting/app/example-api/db"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/html"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/markdown"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
+	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
+)
 
 func genHref(slug string) string {
 	return fmt.Sprintf("/posts/%s", slug)
 }
 
-templ Index(posts []db.Post) {
-	<div class="text-center mx-auto flex flex-col items-center justify-center">
-		<h1 class="text-3xl font-bold mb-4">Posts</h1>
-		<p class="text-gray-600">Posts page.</p>
-		<ul>
-			for _, post := range posts {
-				<li><a href={ genHref(post.Slug) }>{ post.Title }</a></li>
+func formatDate(t time.Time) string {
+	return t.Format("January 2, 2006")
+}
+
+templ Index(posts []db.Post, sessionData *session.SessionData, r *http.Request) {
+	<div class="max-w-4xl mx-auto">
+		<div class="flex justify-between items-center mb-8">
+			<div>
+				<h1 class="text-3xl font-bold text-base-content">Latest Posts</h1>
+				<p class="text-base-content/70 mt-2">Discover our latest articles and insights</p>
+			</div>
+			if sessionData.LoggedIn && sessionData.UserRole == "admin" {
+				<a href="/posts/new" class="btn btn-primary">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+					</svg>
+					New Post
+				</a>
 			}
-		</ul>
+		</div>
+		if len(posts) == 0 {
+			@components.Card("No Posts Yet") {
+				<div class="text-center py-8">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-base-content/30 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+					</svg>
+					<p class="text-base-content/70">No posts have been published yet.</p>
+					if sessionData.LoggedIn && sessionData.UserRole == "admin" {
+						<div class="mt-4">
+							<a href="/posts/new" class="btn btn-primary">Create First Post</a>
+						</div>
+					}
+				</div>
+			}
+		} else {
+			<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+				for _, post := range posts {
+					@PostCard(post)
+				}
+			</div>
+		}
+	</div>
+}
+
+templ PostCard(post db.Post) {
+	<div class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-200">
+		<div class="card-body">
+			<div class="flex items-start justify-between mb-2">
+				<h2 class="card-title text-lg line-clamp-2">
+					<a href={ genHref(post.Slug) } class="link link-hover">
+						{ post.Title }
+					</a>
+				</h2>
+				if !post.Published {
+					<div class="badge badge-warning badge-sm">Draft</div>
+				}
+			</div>
+			<p class="text-base-content/70 text-sm line-clamp-3 mb-4">
+				{ html.TruncateText(html.StripHTML(string(markdown.RenderMarkdown(post.Content))), 150) }
+			</p>
+			<div class="card-actions justify-between items-center">
+				<div class="text-xs text-base-content/50">
+					<span class="font-medium">{ post.Author }</span>
+					<span class="mx-2">•</span>
+					<span>{ formatDate(post.CreatedAt) }</span>
+				</div>
+				<a href={ genHref(post.Slug) } class="btn btn-ghost btn-sm">
+					Read More
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+					</svg>
+				</a>
+			</div>
+		</div>
 	</div>
 }

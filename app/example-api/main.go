@@ -63,6 +63,9 @@ func main() {
 		r.Get("/{slug}", handler.ShowPost(queries))
 		r.Get("/new", handler.CreatePostShow())
 		r.Post("/new", handler.CreatePostSubmit(queries))
+		r.Get("/{id}/edit", handler.EditPostShow(queries))
+		r.Post("/{id}/edit", handler.EditPostSubmit(queries))
+		r.Post("/{id}/delete", handler.DeletePostWeb(queries))
 
 		r.Route("/api", func(r chi.Router) {
 			r.Get("/", handler.ListPosts(queries))

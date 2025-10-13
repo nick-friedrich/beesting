@@ -1,6 +1,6 @@
 -- name: CreatePost :one
-INSERT INTO posts (title, content, author, published)
-VALUES (?, ?, ?, ?)
+INSERT INTO posts (title, slug, content, author, published)
+VALUES (?, ?, ?, ?, ?)
 RETURNING *;
 
 -- name: GetPost :one
@@ -27,6 +27,7 @@ LIMIT ? OFFSET ?;
 -- name: UpdatePost :one
 UPDATE posts
 SET title = ?,
+    slug = ?,
     content = ?,
     author = ?,
     published = ?,

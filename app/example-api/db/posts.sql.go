@@ -33,13 +33,14 @@ func (q *Queries) CountPublishedPosts(ctx context.Context) (int64, error) {
 }
 
 const createPost = `-- name: CreatePost :one
-INSERT INTO posts (title, content, author, published)
-VALUES (?, ?, ?, ?)
+INSERT INTO posts (title, slug, content, author, published)
+VALUES (?, ?, ?, ?, ?)
 RETURNING id, title, slug, content, author, published, created_at, updated_at
 `
 
 type CreatePostParams struct {
 	Title     string `json:"title"`
+	Slug      string `json:"slug"`
 	Content   string `json:"content"`
 	Author    string `json:"author"`
 	Published bool   `json:"published"`
@@ -48,6 +49,7 @@ type CreatePostParams struct {
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
 	row := q.db.QueryRowContext(ctx, createPost,
 		arg.Title,
+		arg.Slug,
 		arg.Content,
 		arg.Author,
 		arg.Published,
@@ -234,6 +236,7 @@ func (q *Queries) UnpublishPost(ctx context.Context, id int64) error {
 const updatePost = `-- name: UpdatePost :one
 UPDATE posts
 SET title = ?,
+    slug = ?,
     content = ?,
     author = ?,
     published = ?,
@@ -244,6 +247,7 @@ RETURNING id, title, slug, content, author, published, created_at, updated_at
 
 type UpdatePostParams struct {
 	Title     string `json:"title"`
+	Slug      string `json:"slug"`
 	Content   string `json:"content"`
 	Author    string `json:"author"`
 	Published bool   `json:"published"`
@@ -253,6 +257,7 @@ type UpdatePostParams struct {
 func (q *Queries) UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error) {
 	row := q.db.QueryRowContext(ctx, updatePost,
 		arg.Title,
+		arg.Slug,
 		arg.Content,
 		arg.Author,
 		arg.Published,
