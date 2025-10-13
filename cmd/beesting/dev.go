@@ -18,6 +18,11 @@ var devCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
 
+		rootDir, err := os.Getwd()
+		if err != nil {
+			return fmt.Errorf("failed to get root directory: %w", err)
+		}
+
 		// Check if app directory exists
 		appDir := filepath.Join("app", name)
 		if _, err := os.Stat(appDir); os.IsNotExist(err) {
@@ -30,25 +35,15 @@ var devCmd = &cobra.Command{
 			return fmt.Errorf("main.go not found in app '%s'", name)
 		}
 
-		// Get absolute path to app directory
-		absAppDir, err := filepath.Abs(appDir)
-		if err != nil {
-			return fmt.Errorf("failed to get absolute path: %w", err)
-		}
-
-		// Run templ generate
-		templCmd := exec.Command("templ", "generate", absAppDir)
-		templCmd.Stdout = os.Stdout
-		templCmd.Stderr = os.Stderr
-		templCmd.Stdin = os.Stdin
-
-		if err := templCmd.Run(); err != nil {
-			return fmt.Errorf("failed to run templ generate: %w", err)
-		}
+		// // Get absolute path to app directory
+		// absAppDir, err := filepath.Abs(appDir)
+		// if err != nil {
+		// 	return fmt.Errorf("failed to get absolute path: %w", err)
+		// }
 
 		// Check if Air is installed
 		if isAirInstalled() {
-			return runWithAir(name, absAppDir)
+			return runWithAir(name, rootDir, appDir)
 		}
 
 		// Fall back to go run
@@ -75,27 +70,44 @@ func isAirInstalled() bool {
 }
 
 // runWithAir runs the app with Air for hot-reloading
-func runWithAir(name, appDir string) error {
+func runWithAir(name, rootDir string, relativeAppDir string) error {
+	appDir := filepath.Join(rootDir, relativeAppDir)
 	fmt.Printf("🐝 Starting %s with hot-reloading (Air)...\n\n", name)
 
 	// Create temporary .air.toml for this app
-	airConfig := fmt.Sprintf(`root = "%s"
-tmp_dir = "%s/tmp"
+	airConfig :=
+		`
+root = "` + rootDir + `"
+testdata_dir = "` + rootDir + `/tmp/testdata"
+tmp_dir = "` + rootDir + `/tmp"
 
 [build]
-  bin = "%s/tmp/main"
-  cmd = "templ generate && go build -o %s/tmp/main %s"
+ 	args_bin = []
+  bin = "` + rootDir + `/tmp/` + name + `"
+  cmd = "templ generate && go build -o ` + rootDir + `/tmp/` + name + ` ` + appDir + `"
   delay = 1000
   exclude_dir = ["tmp", "node_modules"]
+	exclude_file = []
   exclude_regex = ["_test.go", "_templ.go"]
+	exclude_unchanged = false
+	follow_symlink = false
+	full_bin = ""
+	include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html", "templ"]
+	include_file = []
   kill_delay = "500ms"
+  log = "build-errors.log"
+  poll = false
+  poll_interval = 0
+  post_cmd = []
+  pre_cmd = []
   rerun = false
   rerun_delay = 500
   send_interrupt = true
   stop_on_error = false
 
 [color]
+  app = ""
   build = "yellow"
   main = "magenta"
   runner = "green"
@@ -103,11 +115,21 @@ tmp_dir = "%s/tmp"
 
 [log]
   main_only = false
+  silent = false
   time = false
 
+[misc]
+  clean_on_exit = false
+
+[proxy]
+  app_port = 0
+  enabled = false
+  proxy_port = 0
+
 [screen]
-  clear_on_rebuild = true
-`, appDir, appDir, appDir, appDir, appDir)
+  keep_scroll = true
+  clear_on_rebuild = false
+`
 
 	// Write temporary config
 	tmpConfigPath := filepath.Join(appDir, ".air.toml")

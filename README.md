@@ -16,6 +16,12 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 go install github.com/air-verse/air@latest
 ```
 
+Templ:
+
+```bash
+go install github.com/a-h/templ@latest
+```
+
 After installation, you can use `beesting` from anywhere.
 If it don't work check your $GOPATH and make sure you have the `bin` directory in your path. Also try to source your `.zshrc` or `.bashrc` file or restart your terminal.
 

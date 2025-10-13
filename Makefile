@@ -5,12 +5,7 @@ new:
 
 # Run an application in development mode
 dev:
-	@APP_NAME=$(filter-out $@,$(MAKECMDGOALS)); \
-	if [ -f "app/$$APP_NAME/package.json" ]; then \
-		cd app/$$APP_NAME && npm run dev; \
-	else \
-		go run ./cmd/beesting dev $$APP_NAME; \
-	fi
+	cd app/$(filter-out $@,$(MAKECMDGOALS)) && make dev
 
 # Catch-all target to prevent make errors with app names
 %:

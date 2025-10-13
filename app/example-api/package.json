@@ -1,11 +1,12 @@
 {
   "name": "example-api",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "build-css": "npx @tailwindcss/cli -i ./input.css -o ./static/output.css",
     "watch-css": "npx @tailwindcss/cli -i ./input.css -o ./static/output.css --watch",
-    "dev": "concurrently \"npm run watch-css\" \"cd ../.. && go run ./cmd/beesting dev example-api\"",
+    "dev": "node scripts/concurrently.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
