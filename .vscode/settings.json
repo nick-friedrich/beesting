@@ -1,0 +1,12 @@
+{
+  "tailwindCSS.includeLanguages": {
+    "templ": "html"
+  },
+  "prettier.htmlWhitespaceSensitivity": "ignore",
+  "[templ]": {
+    "editor.defaultFormatter": "a-h.templ"
+  },
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  },
+}
