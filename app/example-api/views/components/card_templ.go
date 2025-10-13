@@ -29,7 +29,7 @@ func Card(title string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"card bg-base-100 shadow-xl w-full max-w-md mx-auto\"><div class=\"card-body\"><h2 class=\"card-title text-2xl font-bold text-center mb-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"card bg-base-100 shadow-xl w-full max-w-4xl mx-auto\"><div class=\"card-body\"><h2 class=\"card-title text-2xl font-bold text-center mb-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

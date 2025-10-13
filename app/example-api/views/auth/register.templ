@@ -8,7 +8,7 @@ import (
 )
 
 templ Register(errors types.AuthValidationErrors, name string, email string, r *http.Request) {
-	<div class="min-h-[calc(100vh-200px)] flex items-center justify-center bg-base-200 p-4">
+	<div class="min-h-[calc(100vh-200px)] flex items-center justify-center bg-base-200 p-4 max-w-xl mx-auto">
 		@components.Card("Create your account") {
 			<p class="text-base-content/70 text-center mb-6">Sign up to get started with your account.</p>
 			if errors.General != "" {

@@ -49,7 +49,7 @@ func Index(posts []db.Post, sessionData *session.SessionData, r *http.Request) t
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-4xl mx-auto\"><div class=\"flex justify-between items-center mb-8\"><div><h1 class=\"text-3xl font-bold text-base-content\">Latest Posts</h1><p class=\"text-base-content/70 mt-2\">Discover our latest articles and insights</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-6xl mx-auto\"><div class=\"flex justify-between items-center mb-8\"><div><h1 class=\"text-3xl font-bold text-base-content\">Latest Posts</h1><p class=\"text-base-content/70 mt-2\">Discover our latest articles and insights</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
