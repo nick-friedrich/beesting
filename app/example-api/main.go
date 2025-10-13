@@ -12,6 +12,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/handler"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/mail"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
 )
 
@@ -40,6 +41,9 @@ func main() {
 	if _, err := rand.Read(csrfKey); err != nil {
 		log.Fatal("Failed to generate CSRF key:", err)
 	}
+
+	// Initialize mailer
+	mail.InitMailer(&mail.ConsoleAdapter{})
 
 	// Setup router
 	r := chi.NewRouter()
