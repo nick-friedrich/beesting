@@ -58,7 +58,9 @@ func validateName(name string) string {
 	return ""
 }
 
-func Login() http.HandlerFunc {
+// TODO: Send confirmation email function
+
+func LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sessionData, _ := session.Default.GetSession(r)
 
@@ -92,7 +94,7 @@ func Login() http.HandlerFunc {
 	}
 }
 
-func Register() http.HandlerFunc {
+func RegisterHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sessionData, _ := session.Default.GetSession(r)
 
@@ -116,7 +118,7 @@ func Register() http.HandlerFunc {
 	}
 }
 
-func LoginSubmit(q *db.Queries) http.HandlerFunc {
+func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sessionData, _ := session.Default.GetSession(r)
 
@@ -263,7 +265,7 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 	}
 }
 
-func RegisterSubmit(q *db.Queries) http.HandlerFunc {
+func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sessionData, _ := session.Default.GetSession(r)
 
@@ -419,7 +421,7 @@ func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 	}
 }
 
-func Logout() http.HandlerFunc {
+func LogoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := session.Default.ClearSession(w, r)
 		if err != nil {

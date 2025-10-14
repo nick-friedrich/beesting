@@ -90,11 +90,11 @@ func main() {
 	})
 
 	// Auth routes
-	r.Get("/login", handler.Login())
-	r.Get("/register", handler.Register())
-	r.Post("/login", handler.LoginSubmit(queries))
-	r.Post("/register", handler.RegisterSubmit(queries))
-	r.Get("/logout", handler.Logout())
+	r.Get("/login", handler.LoginHandler())
+	r.Get("/register", handler.RegisterHandler())
+	r.Post("/login", handler.LoginSubmitHandler(queries))
+	r.Post("/register", handler.RegisterSubmitHandler(queries))
+	r.Get("/logout", handler.LogoutHandler())
 
 	// 404 handler for unmatched routes
 	r.NotFound(handler.NotFound())
