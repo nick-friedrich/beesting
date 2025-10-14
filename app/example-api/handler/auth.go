@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
@@ -12,51 +11,14 @@ import (
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/config"
 	passwordPkg "github.com/nick-friedrich/beesting/app/example-api/pkg/password"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/validation"
 	"github.com/nick-friedrich/beesting/app/example-api/types"
 	"github.com/nick-friedrich/beesting/app/example-api/views"
 	authviews "github.com/nick-friedrich/beesting/app/example-api/views/auth"
 	"github.com/oklog/ulid/v2"
 )
 
-// validateEmail validates email format
-func validateEmail(email string) string {
-	if email == "" {
-		return "Email is required"
-	}
-
-	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-	if !emailRegex.MatchString(email) {
-		return "Please enter a valid email address"
-	}
-
-	return ""
-}
-
-// validatePassword validates password strength
-func validatePassword(password string) string {
-	if password == "" {
-		return "Password is required"
-	}
-
-	if len(password) < 8 {
-		return "Password must be at least 8 characters long"
-	}
-
-	return ""
-}
-
-// validateName validates name field
-func validateName(name string) string {
-	if name == "" {
-		return "Name is required"
-	}
-
-	if len(strings.TrimSpace(name)) < 2 {
-		return "Name must be at least 2 characters long"
-	}
-
-	return ""
-}
+// Legacy validation functions removed - now using validator v10 struct-based validation
 
 // TODO: Send confirmation email function
 
@@ -127,31 +89,19 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 			return
 		}
 
-		var errors types.AuthValidationErrors
-		var hasErrors bool = false
-
-		r.ParseForm()
-		email := strings.TrimSpace(r.Form.Get("email"))
-		password := r.Form.Get("password")
-
-		// Validate email
-		if emailErr := validateEmail(email); emailErr != "" {
-			errors.Email = emailErr
-			hasErrors = true
+		// Parse form data into struct
+		form := &validation.LoginForm{
+			Email:    strings.TrimSpace(r.Form.Get("email")),
+			Password: r.Form.Get("password"),
 		}
 
-		// Validate password
-		if passwordErr := validatePassword(password); passwordErr != "" {
-			errors.Password = passwordErr
-			hasErrors = true
-		}
-
-		// If there are validation errors, show the form again
-		if hasErrors {
+		// Validate using struct tags
+		if err := validation.ValidateLoginForm(form); err != nil {
+			errors := validation.ConvertValidationErrors(err)
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
 					Errors:         errors,
-					Email:          email,
+					Email:          form.Email,
 					SuccessMessage: "",
 					ErrorMessage:   "",
 					Request:        r,
@@ -163,14 +113,14 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 		}
 
 		// Authenticate user
-		user, err := q.GetUserByEmail(r.Context(), email)
+		user, err := q.GetUserByEmail(r.Context(), form.Email)
 		if err != nil {
 			// User not found or database error
-			fmt.Printf("Login attempt failed: email=%s, error=%v\n", email, err)
+			fmt.Printf("Login attempt failed: email=%s, error=%v\n", form.Email, err)
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
 					Errors:         types.AuthValidationErrors{General: "Invalid email or password"},
-					Email:          email,
+					Email:          form.Email,
 					SuccessMessage: "",
 					ErrorMessage:   "",
 					Request:        r,
@@ -188,7 +138,7 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
 					Errors:         types.AuthValidationErrors{General: "Email not verified. Please check your email for a verification link."},
-					Email:          email,
+					Email:          form.Email,
 					SuccessMessage: "",
 					ErrorMessage:   "",
 					Request:        r,
@@ -200,7 +150,7 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 		}
 
 		// Verify password using Argon2
-		passwordMatch, err := passwordPkg.VerifyPassword(password, user.PasswordHash)
+		passwordMatch, err := passwordPkg.VerifyPassword(form.Password, user.PasswordHash)
 		if err != nil {
 			fmt.Printf("Password verification error: %v\n", err)
 			views.Layout(
@@ -208,7 +158,7 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 					Errors: types.AuthValidationErrors{
 						General: "Authentication error. Please try again.",
 					},
-					Email:          email,
+					Email:          form.Email,
 					SuccessMessage: "",
 					ErrorMessage:   "",
 					Request:        r,
@@ -221,13 +171,13 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 		}
 
 		if !passwordMatch {
-			fmt.Printf("Login attempt failed: email=%s, invalid password\n", email)
+			fmt.Printf("Login attempt failed: email=%s, invalid password\n", form.Email)
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
 					Errors: types.AuthValidationErrors{
 						General: "Invalid email or password",
 					},
-					Email:          email,
+					Email:          form.Email,
 					SuccessMessage: "",
 					ErrorMessage:   "",
 					Request:        r,
@@ -248,7 +198,7 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
 					Errors:         types.AuthValidationErrors{General: "Login successful but session error. Please try again."},
-					Email:          email,
+					Email:          form.Email,
 					SuccessMessage: "",
 					ErrorMessage:   "",
 					Request:        r,
@@ -260,7 +210,7 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 			return
 		}
 
-		fmt.Printf("Login successful: user_id=%s, email=%s\n", user.ID, email)
+		fmt.Printf("Login successful: user_id=%s, email=%s\n", user.ID, form.Email)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
@@ -274,46 +224,22 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 			return
 		}
 
-		var errors types.AuthValidationErrors
-		var hasErrors bool = false
-
-		r.ParseForm()
-		name := strings.TrimSpace(r.Form.Get("name"))
-		email := strings.TrimSpace(r.Form.Get("email"))
-		password := r.Form.Get("password")
-		confirmPassword := r.Form.Get("confirm_password")
-
-		// Validate name
-		if nameErr := validateName(name); nameErr != "" {
-			errors.Name = nameErr
-			hasErrors = true
+		// Parse form data into struct
+		form := &validation.RegisterForm{
+			Name:            strings.TrimSpace(r.Form.Get("name")),
+			Email:           strings.TrimSpace(r.Form.Get("email")),
+			Password:        r.Form.Get("password"),
+			ConfirmPassword: r.Form.Get("confirm_password"),
 		}
 
-		// Validate email
-		if emailErr := validateEmail(email); emailErr != "" {
-			errors.Email = emailErr
-			hasErrors = true
-		}
-
-		// Validate password
-		if passwordErr := validatePassword(password); passwordErr != "" {
-			errors.Password = passwordErr
-			hasErrors = true
-		}
-
-		// Validate password confirmation
-		if password != confirmPassword {
-			errors.Password = "Passwords do not match"
-			hasErrors = true
-		}
-
-		// If there are validation errors, show the form again
-		if hasErrors {
+		// Validate using struct tags
+		if err := validation.ValidateRegisterForm(form); err != nil {
+			errors := validation.ConvertValidationErrors(err)
 			views.Layout(
 				authviews.Register(authviews.RegisterProps{
 					Errors:  errors,
-					Name:    name,
-					Email:   email,
+					Name:    form.Name,
+					Email:   form.Email,
 					Request: r,
 				}),
 				sessionData,
@@ -323,14 +249,14 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 		}
 
 		// Hash the password using Argon2
-		passwordHash, err := passwordPkg.HashPassword(password)
+		passwordHash, err := passwordPkg.HashPassword(form.Password)
 		if err != nil {
 			fmt.Printf("Password hashing error: %v\n", err)
 			views.Layout(
 				authviews.Register(authviews.RegisterProps{
 					Errors:  types.AuthValidationErrors{General: "Registration error. Please try again."},
-					Name:    name,
-					Email:   email,
+					Name:    form.Name,
+					Email:   form.Email,
 					Request: r,
 				}),
 				sessionData,
@@ -350,8 +276,8 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 		// Create user with hashed password
 		user, err := q.CreateUser(r.Context(), db.CreateUserParams{
 			ID:                         ulid.Make().String(),
-			Name:                       name,
-			Email:                      email,
+			Name:                       form.Name,
+			Email:                      form.Email,
 			PasswordHash:               passwordHash,
 			Confirmemailtoken:          sql.NullString{String: confirmEmailToken, Valid: true},
 			Confirmemailtokenexpiresat: sql.NullTime{Time: confirmEmailTokenExpiresAt, Valid: true},
@@ -365,8 +291,8 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 					views.Layout(
 						authviews.Register(authviews.RegisterProps{
 							Errors:  types.AuthValidationErrors{Email: "Email already exists. Please use a different email."},
-							Name:    name,
-							Email:   email,
+							Name:    form.Name,
+							Email:   form.Email,
 							Request: r,
 						}),
 						sessionData,
@@ -376,8 +302,8 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 					views.Layout(
 						authviews.Register(authviews.RegisterProps{
 							Errors:  types.AuthValidationErrors{Name: "Username already exists. Please choose a different name."},
-							Name:    name,
-							Email:   email,
+							Name:    form.Name,
+							Email:   form.Email,
 							Request: r,
 						}),
 						sessionData,
@@ -387,8 +313,8 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 					views.Layout(
 						authviews.Register(authviews.RegisterProps{
 							Errors:  types.AuthValidationErrors{General: "Registration error. Please try again."},
-							Name:    name,
-							Email:   email,
+							Name:    form.Name,
+							Email:   form.Email,
 							Request: r,
 						}),
 						sessionData,
@@ -399,8 +325,8 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 				views.Layout(
 					authviews.Register(authviews.RegisterProps{
 						Errors:  types.AuthValidationErrors{General: "Registration error. Please try again."},
-						Name:    name,
-						Email:   email,
+						Name:    form.Name,
+						Email:   form.Email,
 						Request: r,
 					}),
 					sessionData,

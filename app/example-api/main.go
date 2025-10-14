@@ -15,6 +15,7 @@ import (
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/config"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/mail"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/validation"
 )
 
 func main() {
@@ -25,6 +26,9 @@ func main() {
 			ConfirmEmail: true,
 		},
 	})
+
+	// Initialize validator singleton
+	validation.InitValidator()
 
 	// Initialize database
 	database, err := sql.Open("sqlite3", "./app.db")
