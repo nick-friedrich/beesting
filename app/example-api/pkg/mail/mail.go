@@ -33,7 +33,11 @@ func GetMailer() *Mailer {
 }
 
 func InitMailer(adapter MailerAdapter) {
-	GetMailer().Adapter = adapter
+	once.Do(func() {
+		mailerInstance = &Mailer{
+			Adapter: adapter,
+		}
+	})
 }
 
 func (m *Mailer) SendEmail(email *Email) error {

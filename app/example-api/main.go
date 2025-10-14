@@ -12,11 +12,19 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/handler"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/config"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/mail"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
 )
 
 func main() {
+
+	// Initialize config
+	config.InitConfig(&config.Config{
+		AuthConfig: config.AuthConfig{
+			ConfirmEmail: true,
+		},
+	})
 
 	// Initialize database
 	database, err := sql.Open("sqlite3", "./app.db")

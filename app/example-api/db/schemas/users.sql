@@ -6,7 +6,13 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
+    -- Role
     role TEXT NOT NULL DEFAULT 'user',
+    -- Confirmation
+    confirmedAt DATETIME,
+    confirmEmailToken TEXT,
+    confirmEmailTokenExpiresAt DATETIME,
+    -- Timestamps
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

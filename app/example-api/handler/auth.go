@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/nick-friedrich/beesting/app/example-api/db"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/config"
 	passwordPkg "github.com/nick-friedrich/beesting/app/example-api/pkg/password"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
 	"github.com/nick-friedrich/beesting/app/example-api/types"
@@ -65,16 +68,27 @@ func Login() http.HandlerFunc {
 		}
 
 		registered := r.URL.Query().Get("registered") == "true"
+		confirmEmail := r.URL.Query().Get("confirmEmail") == "true"
+
+		var successMessage string
+		if registered {
+			successMessage = "Registration successful! Please log in with your credentials."
+		}
+		if confirmEmail {
+			successMessage = "Email confirmed! Please log in with your credentials."
+		}
 
 		views.Layout(
-			authviews.Login(types.AuthValidationErrors{}, "", registered, r),
+			authviews.Login(authviews.LoginProps{
+				Errors:         types.AuthValidationErrors{},
+				Email:          "",
+				SuccessMessage: successMessage,
+				ErrorMessage:   "",
+				Request:        r,
+			}),
 			sessionData,
 			"Login",
 		).Render(r.Context(), w)
-
-		// web.RenderWithLayoutAndSession(w, "layout.html", "templates/auth/login.html", map[string]any{
-		// 	"registered": registered,
-		// }, sessionData)
 	}
 }
 
@@ -88,7 +102,12 @@ func Register() http.HandlerFunc {
 		}
 
 		views.Layout(
-			authviews.Register(types.AuthValidationErrors{}, "", "", r),
+			authviews.Register(authviews.RegisterProps{
+				Errors:  types.AuthValidationErrors{},
+				Name:    "",
+				Email:   "",
+				Request: r,
+			}),
 			sessionData,
 			"Register",
 		).Render(r.Context(), w)
@@ -128,7 +147,13 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 		// If there are validation errors, show the form again
 		if hasErrors {
 			views.Layout(
-				authviews.Login(errors, email, false, r),
+				authviews.Login(authviews.LoginProps{
+					Errors:         errors,
+					Email:          email,
+					SuccessMessage: "",
+					ErrorMessage:   "",
+					Request:        r,
+				}),
 				sessionData,
 				"Login",
 			).Render(r.Context(), w)
@@ -141,11 +166,34 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 			// User not found or database error
 			fmt.Printf("Login attempt failed: email=%s, error=%v\n", email, err)
 			views.Layout(
-				authviews.Login(types.AuthValidationErrors{General: "Invalid email or password"}, email, false, r),
+				authviews.Login(authviews.LoginProps{
+					Errors:         types.AuthValidationErrors{General: "Invalid email or password"},
+					Email:          email,
+					SuccessMessage: "",
+					ErrorMessage:   "",
+					Request:        r,
+				}),
 				sessionData,
 				"Login",
 			).Render(r.Context(), w)
 
+			return
+		}
+
+		// Get config and check if verified if enabled
+		config := config.GetConfig()
+		if config.AuthConfig.ConfirmEmail && !user.Confirmedat.Valid {
+			views.Layout(
+				authviews.Login(authviews.LoginProps{
+					Errors:         types.AuthValidationErrors{General: "Email not verified. Please check your email for a verification link."},
+					Email:          email,
+					SuccessMessage: "",
+					ErrorMessage:   "",
+					Request:        r,
+				}),
+				sessionData,
+				"Login",
+			).Render(r.Context(), w)
 			return
 		}
 
@@ -154,7 +202,15 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 		if err != nil {
 			fmt.Printf("Password verification error: %v\n", err)
 			views.Layout(
-				authviews.Login(types.AuthValidationErrors{General: "Authentication error. Please try again."}, email, false, r),
+				authviews.Login(authviews.LoginProps{
+					Errors: types.AuthValidationErrors{
+						General: "Authentication error. Please try again.",
+					},
+					Email:          email,
+					SuccessMessage: "",
+					ErrorMessage:   "",
+					Request:        r,
+				}),
 				sessionData,
 				"Login",
 			).Render(r.Context(), w)
@@ -165,7 +221,15 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 		if !passwordMatch {
 			fmt.Printf("Login attempt failed: email=%s, invalid password\n", email)
 			views.Layout(
-				authviews.Login(types.AuthValidationErrors{General: "Invalid email or password"}, email, false, r),
+				authviews.Login(authviews.LoginProps{
+					Errors: types.AuthValidationErrors{
+						General: "Invalid email or password",
+					},
+					Email:          email,
+					SuccessMessage: "",
+					ErrorMessage:   "",
+					Request:        r,
+				}),
 				sessionData,
 				"Login",
 			).Render(r.Context(), w)
@@ -180,7 +244,13 @@ func LoginSubmit(q *db.Queries) http.HandlerFunc {
 			sessionData, _ := session.Default.GetSession(r)
 
 			views.Layout(
-				authviews.Login(types.AuthValidationErrors{General: "Login successful but session error. Please try again."}, email, false, r),
+				authviews.Login(authviews.LoginProps{
+					Errors:         types.AuthValidationErrors{General: "Login successful but session error. Please try again."},
+					Email:          email,
+					SuccessMessage: "",
+					ErrorMessage:   "",
+					Request:        r,
+				}),
 				sessionData,
 				"Login",
 			).Render(r.Context(), w)
@@ -238,7 +308,12 @@ func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 		// If there are validation errors, show the form again
 		if hasErrors {
 			views.Layout(
-				authviews.Register(errors, name, email, r),
+				authviews.Register(authviews.RegisterProps{
+					Errors:  errors,
+					Name:    name,
+					Email:   email,
+					Request: r,
+				}),
 				sessionData,
 				"Register",
 			).Render(r.Context(), w)
@@ -250,46 +325,82 @@ func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 		if err != nil {
 			fmt.Printf("Password hashing error: %v\n", err)
 			views.Layout(
-				authviews.Register(types.AuthValidationErrors{General: "Registration error. Please try again."}, name, email, r),
+				authviews.Register(authviews.RegisterProps{
+					Errors:  types.AuthValidationErrors{General: "Registration error. Please try again."},
+					Name:    name,
+					Email:   email,
+					Request: r,
+				}),
 				sessionData,
 				"Register",
 			).Render(r.Context(), w)
 			return
 		}
 
+		var confirmEmailToken string
+		var confirmEmailTokenExpiresAt time.Time
+		config := config.GetConfig()
+		if config.AuthConfig.ConfirmEmail {
+			confirmEmailToken = ulid.Make().String()
+			confirmEmailTokenExpiresAt = time.Now().Add(time.Hour * 24)
+		}
+
 		// Create user with hashed password
 		user, err := q.CreateUser(r.Context(), db.CreateUserParams{
-			ID:           ulid.Make().String(),
-			Name:         name,
-			Email:        email,
-			PasswordHash: passwordHash,
+			ID:                         ulid.Make().String(),
+			Name:                       name,
+			Email:                      email,
+			PasswordHash:               passwordHash,
+			Confirmemailtoken:          sql.NullString{String: confirmEmailToken, Valid: true},
+			Confirmemailtokenexpiresat: sql.NullTime{Time: confirmEmailTokenExpiresAt, Valid: true},
 		})
+
 		if err != nil {
 			fmt.Printf("User creation error: %v\n", err)
 			// Check if it's a unique constraint violation
 			if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 				if strings.Contains(err.Error(), "email") {
 					views.Layout(
-						authviews.Register(types.AuthValidationErrors{Email: "Email already exists. Please use a different email."}, name, email, r),
+						authviews.Register(authviews.RegisterProps{
+							Errors:  types.AuthValidationErrors{Email: "Email already exists. Please use a different email."},
+							Name:    name,
+							Email:   email,
+							Request: r,
+						}),
 						sessionData,
 						"Register",
 					).Render(r.Context(), w)
 				} else if strings.Contains(err.Error(), "name") {
 					views.Layout(
-						authviews.Register(types.AuthValidationErrors{Name: "Username already exists. Please choose a different name."}, name, email, r),
+						authviews.Register(authviews.RegisterProps{
+							Errors:  types.AuthValidationErrors{Name: "Username already exists. Please choose a different name."},
+							Name:    name,
+							Email:   email,
+							Request: r,
+						}),
 						sessionData,
 						"Register",
 					).Render(r.Context(), w)
 				} else {
 					views.Layout(
-						authviews.Register(types.AuthValidationErrors{General: "Registration error. Please try again."}, name, email, r),
+						authviews.Register(authviews.RegisterProps{
+							Errors:  types.AuthValidationErrors{General: "Registration error. Please try again."},
+							Name:    name,
+							Email:   email,
+							Request: r,
+						}),
 						sessionData,
 						"Register",
 					).Render(r.Context(), w)
 				}
 			} else {
 				views.Layout(
-					authviews.Register(types.AuthValidationErrors{General: "Registration error. Please try again."}, name, email, r),
+					authviews.Register(authviews.RegisterProps{
+						Errors:  types.AuthValidationErrors{General: "Registration error. Please try again."},
+						Name:    name,
+						Email:   email,
+						Request: r,
+					}),
 					sessionData,
 					"Register",
 				).Render(r.Context(), w)
@@ -299,8 +410,12 @@ func RegisterSubmit(q *db.Queries) http.HandlerFunc {
 
 		fmt.Printf("User created: %+v\n", user)
 
-		// Simulate successful registration
-		http.Redirect(w, r, "/login?registered=true", http.StatusSeeOther)
+		// Build URL with config
+		if config.AuthConfig.ConfirmEmail {
+			http.Redirect(w, r, "/login?registered=true&confirmEmail=true", http.StatusSeeOther)
+		} else {
+			http.Redirect(w, r, "/login?registered=true", http.StatusSeeOther)
+		}
 	}
 }
 

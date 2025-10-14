@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -28,11 +29,14 @@ type Session struct {
 }
 
 type User struct {
-	ID           string    `json:"id"`
-	Name         string    `json:"name"`
-	Email        string    `json:"email"`
-	PasswordHash string    `json:"password_hash"`
-	Role         string    `json:"role"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID                         string         `json:"id"`
+	Name                       string         `json:"name"`
+	Email                      string         `json:"email"`
+	PasswordHash               string         `json:"password_hash"`
+	Role                       string         `json:"role"`
+	Confirmedat                sql.NullTime   `json:"confirmedat"`
+	Confirmemailtoken          sql.NullString `json:"confirmemailtoken"`
+	Confirmemailtokenexpiresat sql.NullTime   `json:"confirmemailtokenexpiresat"`
+	CreatedAt                  time.Time      `json:"created_at"`
+	UpdatedAt                  time.Time      `json:"updated_at"`
 }

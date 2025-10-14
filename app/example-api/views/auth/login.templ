@@ -7,18 +7,29 @@ import (
 	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
 )
 
-templ Login(errors types.AuthValidationErrors, email string, registered bool, r *http.Request) {
+type LoginProps struct {
+	Errors         types.AuthValidationErrors
+	Email          string
+	SuccessMessage string
+	ErrorMessage   string
+	Request        *http.Request
+}
+
+templ Login(props LoginProps) {
 	<div class="min-h-[calc(100vh-200px)] flex items-center justify-center bg-base-200 p-4 max-w-xl	 mx-auto">
 		@components.Card("Sign in to your account") {
 			<p class="text-base-content/70 text-center mb-6">Login to your account to continue.</p>
-			if errors.General != "" {
-				@components.Alert("error", errors.General)
+			if props.Errors.General != "" {
+				@components.Alert("error", props.Errors.General)
 			}
-			if registered {
-				@components.Alert("success", "Registration successful! Please log in with your credentials.")
+			if props.SuccessMessage != "" {
+				@components.Alert("success", props.SuccessMessage)
+			}
+			if props.ErrorMessage != "" {
+				@components.Alert("error", props.ErrorMessage)
 			}
 			<form method="post" class="space-y-4">
-				@components.CSRF(r)
+				@components.CSRF(props.Request)
 				<div class="form-control">
 					<label class="label">
 						<span class="label-text font-medium">Email</span>
@@ -26,18 +37,18 @@ templ Login(errors types.AuthValidationErrors, email string, registered bool, r 
 					<input
 						name="email"
 						type="email"
-						if errors.Email != "" {
+						if props.Errors.Email != "" {
 							class="input input-bordered input-error w-full"
 						} else {
 							class="input input-bordered w-full"
 						}
 						placeholder="Enter your email"
-						value={ email }
+						value={ props.Email }
 						required
 					/>
-					if errors.Email != "" {
+					if props.Errors.Email != "" {
 						<label class="label">
-							<span class="label-text-alt text-error">{ errors.Email }</span>
+							<span class="label-text-alt text-error">{ props.Errors.Email }</span>
 						</label>
 					}
 				</div>
@@ -48,7 +59,7 @@ templ Login(errors types.AuthValidationErrors, email string, registered bool, r 
 					<input
 						name="password"
 						type="password"
-						if errors.Password != "" {
+						if props.Errors.Password != "" {
 							class="input input-bordered input-error w-full"
 						} else {
 							class="input input-bordered w-full"
@@ -56,9 +67,9 @@ templ Login(errors types.AuthValidationErrors, email string, registered bool, r 
 						placeholder="Enter your password"
 						required
 					/>
-					if errors.Password != "" {
+					if props.Errors.Password != "" {
 						<label class="label">
-							<span class="label-text-alt text-error">{ errors.Password }</span>
+							<span class="label-text-alt text-error">{ props.Errors.Password }</span>
 						</label>
 					}
 				</div>

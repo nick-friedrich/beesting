@@ -7,19 +7,22 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (id, name, email, password_hash)
-VALUES (?, ?, ?, ?)
-RETURNING id, name, email, password_hash, role, created_at, updated_at
+INSERT INTO users (id, name, email, password_hash, confirmEmailToken, confirmEmailTokenExpiresAt)
+VALUES (?, ?, ?, ?, ?, ?)
+RETURNING id, name, email, password_hash, role, confirmedat, confirmemailtoken, confirmemailtokenexpiresat, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	PasswordHash string `json:"password_hash"`
+	ID                         string         `json:"id"`
+	Name                       string         `json:"name"`
+	Email                      string         `json:"email"`
+	PasswordHash               string         `json:"password_hash"`
+	Confirmemailtoken          sql.NullString `json:"confirmemailtoken"`
+	Confirmemailtokenexpiresat sql.NullTime   `json:"confirmemailtokenexpiresat"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -28,6 +31,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Name,
 		arg.Email,
 		arg.PasswordHash,
+		arg.Confirmemailtoken,
+		arg.Confirmemailtokenexpiresat,
 	)
 	var i User
 	err := row.Scan(
@@ -36,6 +41,9 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Email,
 		&i.PasswordHash,
 		&i.Role,
+		&i.Confirmedat,
+		&i.Confirmemailtoken,
+		&i.Confirmemailtokenexpiresat,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -43,7 +51,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, name, email, password_hash, role, created_at, updated_at FROM users
+SELECT id, name, email, password_hash, role, confirmedat, confirmemailtoken, confirmemailtokenexpiresat, created_at, updated_at FROM users
 WHERE id = ?
 LIMIT 1
 `
@@ -57,6 +65,9 @@ func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 		&i.Email,
 		&i.PasswordHash,
 		&i.Role,
+		&i.Confirmedat,
+		&i.Confirmemailtoken,
+		&i.Confirmemailtokenexpiresat,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -64,7 +75,7 @@ func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, password_hash, role, created_at, updated_at FROM users
+SELECT id, name, email, password_hash, role, confirmedat, confirmemailtoken, confirmemailtokenexpiresat, created_at, updated_at FROM users
 WHERE email = ?
 LIMIT 1
 `
@@ -78,6 +89,9 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Email,
 		&i.PasswordHash,
 		&i.Role,
+		&i.Confirmedat,
+		&i.Confirmemailtoken,
+		&i.Confirmemailtokenexpiresat,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

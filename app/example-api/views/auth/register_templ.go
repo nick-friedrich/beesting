@@ -15,7 +15,14 @@ import (
 	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
 )
 
-func Register(errors types.AuthValidationErrors, name string, email string, r *http.Request) templ.Component {
+type RegisterProps struct {
+	Errors  types.AuthValidationErrors
+	Name    string
+	Email   string
+	Request *http.Request
+}
+
+func Register(props RegisterProps) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -56,8 +63,8 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errors.General != "" {
-				templ_7745c5c3_Err = components.Alert("error", errors.General).Render(ctx, templ_7745c5c3_Buffer)
+			if props.Errors.General != "" {
+				templ_7745c5c3_Err = components.Alert("error", props.Errors.General).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -66,7 +73,7 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.CSRF(r).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.CSRF(props.Request).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -74,7 +81,7 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errors.Name != "" {
+			if props.Errors.Name != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " class=\"input input-bordered input-error w-full\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -90,9 +97,9 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(name)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(props.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 32, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 39, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -102,15 +109,15 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errors.Name != "" {
+			if props.Errors.Name != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<label class=\"label\"><span class=\"label-text-alt text-error\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(errors.Name)
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(props.Errors.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 37, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 44, Col: 66}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -125,7 +132,7 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errors.Email != "" {
+			if props.Errors.Email != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " class=\"input input-bordered input-error w-full\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -141,9 +148,9 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(email)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(props.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 54, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 61, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -153,15 +160,15 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errors.Email != "" {
+			if props.Errors.Email != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<label class=\"label\"><span class=\"label-text-alt text-error\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(errors.Email)
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(props.Errors.Email)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 59, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 66, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -176,7 +183,7 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errors.Password != "" {
+			if props.Errors.Password != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " class=\"input input-bordered input-error w-full\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -191,15 +198,15 @@ func Register(errors types.AuthValidationErrors, name string, email string, r *h
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errors.Password != "" {
+			if props.Errors.Password != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<label class=\"label\"><span class=\"label-text-alt text-error\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var7 string
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(errors.Password)
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(props.Errors.Password)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 80, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/register.templ`, Line: 87, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
