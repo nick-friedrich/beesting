@@ -20,13 +20,22 @@ templ Login(props LoginProps) {
 		@components.Card("Sign in to your account") {
 			<p class="text-base-content/70 text-center mb-6">Login to your account to continue.</p>
 			if props.Errors.General != "" {
-				@components.Alert("error", props.Errors.General)
+				@components.Alert(components.AlertProps{
+					AlertType: components.AlertTypeError,
+					Message:   props.Errors.General,
+				})
 			}
 			if props.SuccessMessage != "" {
-				@components.Alert("success", props.SuccessMessage)
+				@components.Alert(components.AlertProps{
+					AlertType: components.AlertTypeSuccess,
+					Message:   props.SuccessMessage,
+				})
 			}
 			if props.ErrorMessage != "" {
-				@components.Alert("error", props.ErrorMessage)
+				@components.Alert(components.AlertProps{
+					AlertType: components.AlertTypeError,
+					Message:   props.ErrorMessage,
+				})
 			}
 			<form method="post" class="space-y-4">
 				@components.CSRF(props.Request)

@@ -1,21 +1,44 @@
 package components
 
-templ Alert(alertType string, message string) {
-	if alertType == "error" {
+import "strings"
+
+func firstToUpper(str string) string {
+	if len(str) == 0 {
+		return ""
+	}
+	return strings.ToUpper(str[:1]) + str[1:]
+}
+
+type AlertProps struct {
+	AlertType AlertType
+	Message   string
+}
+
+type AlertType string
+
+const (
+	AlertTypeError   AlertType = "error"
+	AlertTypeSuccess AlertType = "success"
+	AlertTypeWarning AlertType = "warning"
+	AlertTypeInfo    AlertType = "info"
+)
+
+templ Alert(props AlertProps) {
+	if props.AlertType == AlertTypeError {
 		<div class="alert alert-error alert-soft">
-			<span>{ message }</span>
+			<span>{ firstToUpper(props.Message) }</span>
 		</div>
-	} else if alertType == "success" {
+	} else if props.AlertType == AlertTypeSuccess {
 		<div class="alert alert-success alert-soft">
-			<span>{ message }</span>
+			<span>{ firstToUpper(props.Message) }</span>
 		</div>
-	} else if alertType == "warning" {
+	} else if props.AlertType == AlertTypeWarning {
 		<div class="alert alert-warning alert-soft">
-			<span>{ message }</span>
+			<span>{ firstToUpper(props.Message) }</span>
 		</div>
-	} else if alertType == "info" {
+	} else if props.AlertType == AlertTypeInfo {
 		<div class="alert alert-info alert-soft">
-			<span>{ message }</span>
+			<span>{ firstToUpper(props.Message) }</span>
 		</div>
 	}
 }

@@ -11,7 +11,7 @@ import (
 // LoginForm represents login form data with validation tags
 type LoginForm struct {
 	Email    string `json:"email" form:"email" validate:"required,email"`
-	Password string `json:"password" form:"password" validate:"required,min=8"`
+	Password string `json:"password" form:"password" validate:"required"`
 }
 
 // RegisterForm represents registration form data with validation tags

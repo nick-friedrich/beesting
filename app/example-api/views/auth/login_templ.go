@@ -65,7 +65,10 @@ func Login(props LoginProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if props.Errors.General != "" {
-				templ_7745c5c3_Err = components.Alert("error", props.Errors.General).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = components.Alert(components.AlertProps{
+					AlertType: components.AlertTypeError,
+					Message:   props.Errors.General,
+				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -75,7 +78,10 @@ func Login(props LoginProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if props.SuccessMessage != "" {
-				templ_7745c5c3_Err = components.Alert("success", props.SuccessMessage).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = components.Alert(components.AlertProps{
+					AlertType: components.AlertTypeSuccess,
+					Message:   props.SuccessMessage,
+				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -85,7 +91,10 @@ func Login(props LoginProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if props.ErrorMessage != "" {
-				templ_7745c5c3_Err = components.Alert("error", props.ErrorMessage).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = components.Alert(components.AlertProps{
+					AlertType: components.AlertTypeError,
+					Message:   props.ErrorMessage,
+				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -120,7 +129,7 @@ func Login(props LoginProps) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(props.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/login.templ`, Line: 46, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/login.templ`, Line: 55, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -138,7 +147,7 @@ func Login(props LoginProps) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(props.Errors.Email)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/login.templ`, Line: 51, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/login.templ`, Line: 60, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -176,7 +185,7 @@ func Login(props LoginProps) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(props.Errors.Password)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/login.templ`, Line: 72, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth/login.templ`, Line: 81, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
