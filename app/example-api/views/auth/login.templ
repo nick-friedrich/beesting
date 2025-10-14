@@ -5,6 +5,7 @@ import (
 
 	"github.com/nick-friedrich/beesting/app/example-api/types"
 	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
+	viewUtils "github.com/nick-friedrich/beesting/app/example-api/views/utils"
 )
 
 type LoginProps struct {
@@ -57,7 +58,7 @@ templ Login(props LoginProps) {
 					/>
 					if props.Errors.Email != "" {
 						<label class="label">
-							<span class="label-text-alt text-error">{ props.Errors.Email }</span>
+							<span class="label-text-alt text-error">{ viewUtils.FirstToUpper(props.Errors.Email) }</span>
 						</label>
 					}
 				</div>
@@ -78,7 +79,7 @@ templ Login(props LoginProps) {
 					/>
 					if props.Errors.Password != "" {
 						<label class="label">
-							<span class="label-text-alt text-error">{ props.Errors.Password }</span>
+							<span class="label-text-alt text-error">{ viewUtils.FirstToUpper(props.Errors.Password) }</span>
 						</label>
 					}
 				</div>

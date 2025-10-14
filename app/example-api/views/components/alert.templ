@@ -1,13 +1,6 @@
 package components
 
-import "strings"
-
-func firstToUpper(str string) string {
-	if len(str) == 0 {
-		return ""
-	}
-	return strings.ToUpper(str[:1]) + str[1:]
-}
+import "github.com/nick-friedrich/beesting/app/example-api/views/utils"
 
 type AlertProps struct {
 	AlertType AlertType
@@ -26,19 +19,19 @@ const (
 templ Alert(props AlertProps) {
 	if props.AlertType == AlertTypeError {
 		<div class="alert alert-error alert-soft">
-			<span>{ firstToUpper(props.Message) }</span>
+			<span>{ viewUtils.FirstToUpper(props.Message) }</span>
 		</div>
 	} else if props.AlertType == AlertTypeSuccess {
 		<div class="alert alert-success alert-soft">
-			<span>{ firstToUpper(props.Message) }</span>
+			<span>{ viewUtils.FirstToUpper(props.Message) }</span>
 		</div>
 	} else if props.AlertType == AlertTypeWarning {
 		<div class="alert alert-warning alert-soft">
-			<span>{ firstToUpper(props.Message) }</span>
+			<span>{ viewUtils.FirstToUpper(props.Message) }</span>
 		</div>
 	} else if props.AlertType == AlertTypeInfo {
 		<div class="alert alert-info alert-soft">
-			<span>{ firstToUpper(props.Message) }</span>
+			<span>{ viewUtils.FirstToUpper(props.Message) }</span>
 		</div>
 	}
 }
