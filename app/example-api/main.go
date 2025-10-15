@@ -23,6 +23,10 @@ func main() {
 	// Initialize config
 	config.InitConfig(&config.Config{
 		BaseURL: "http://localhost:3000",
+		EmailConfig: config.EmailConfig{
+			From: "noreply@beesting.com",
+			Name: "BeeSting",
+		},
 		AuthConfig: config.AuthConfig{
 			ConfirmEmail: true,
 		},

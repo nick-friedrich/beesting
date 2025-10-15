@@ -3,12 +3,18 @@ package config
 import "sync"
 
 type Config struct {
-	BaseURL    string
-	AuthConfig AuthConfig
+	BaseURL     string
+	EmailConfig EmailConfig
+	AuthConfig  AuthConfig
 }
 
 type AuthConfig struct {
 	ConfirmEmail bool
+}
+
+type EmailConfig struct {
+	From string
+	Name string
 }
 
 var (
@@ -20,6 +26,10 @@ func GetConfig() *Config {
 	once.Do(func() {
 		configInstance = &Config{
 			BaseURL: "http://localhost:3000",
+			EmailConfig: EmailConfig{
+				From: "noreply@example.com",
+				Name: "Example",
+			},
 			AuthConfig: AuthConfig{
 				ConfirmEmail: true, // Default value
 			},

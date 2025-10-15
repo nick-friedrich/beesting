@@ -21,12 +21,11 @@ import (
 
 // Legacy validation functions removed - now using validator v10 struct-based validation
 
-// TODO: Send confirmation email function
 func sendConfirmationEmail(user *db.User) error {
 	config := config.GetConfig()
 	mailer := mail.GetMailer()
 	err := mailer.SendEmail(&mail.Email{
-		From:    "noreply@example.com",
+		From:    fmt.Sprintf("%s <%s>", config.EmailConfig.Name, config.EmailConfig.From),
 		To:      user.Email,
 		Subject: "Confirm your email",
 		Body: fmt.Sprintf(`
