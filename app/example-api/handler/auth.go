@@ -52,14 +52,17 @@ func LoginHandler() http.HandlerFunc {
 		}
 
 		registered := r.URL.Query().Get("registered") == "true"
-		confirmEmail := r.URL.Query().Get("confirmEmail") == "true"
+		needsConfirmation := r.URL.Query().Get("needsConfirmation") == "true"
+		emailConfirmed := r.URL.Query().Get("emailConfirmed") == "true"
 		emailSent := r.URL.Query().Get("emailSent") == "true"
 
 		var successMessage string
-		if registered {
+		if registered && needsConfirmation {
+			successMessage = "Registration successful! Please check your email for a verification link to activate your account."
+		} else if registered {
 			successMessage = "Registration successful! Please log in with your credentials."
 		}
-		if confirmEmail {
+		if emailConfirmed {
 			successMessage = "Email confirmed! Please log in with your credentials."
 		}
 		if emailSent {
@@ -354,7 +357,7 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 
 		// Build URL with config
 		if config.AuthConfig.ConfirmEmail {
-			http.Redirect(w, r, "/login?registered=true&confirmEmail=true", http.StatusSeeOther)
+			http.Redirect(w, r, "/login?registered=true&needsConfirmation=true", http.StatusSeeOther)
 		} else {
 			http.Redirect(w, r, "/login?registered=true", http.StatusSeeOther)
 		}
@@ -395,7 +398,7 @@ func VerifyEmailHandler(q *db.Queries) http.HandlerFunc {
 		}
 
 		// Redirect to login with success message
-		http.Redirect(w, r, "/login?confirmEmail=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/login?emailConfirmed=true", http.StatusSeeOther)
 	}
 }
 
