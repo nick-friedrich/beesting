@@ -3,6 +3,7 @@ package config
 import "sync"
 
 type Config struct {
+	BaseURL    string
 	AuthConfig AuthConfig
 }
 
@@ -18,6 +19,7 @@ var (
 func GetConfig() *Config {
 	once.Do(func() {
 		configInstance = &Config{
+			BaseURL: "http://localhost:3000",
 			AuthConfig: AuthConfig{
 				ConfirmEmail: true, // Default value
 			},

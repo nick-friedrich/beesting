@@ -9,6 +9,7 @@ import (
 
 	"github.com/nick-friedrich/beesting/app/example-api/db"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/config"
+	"github.com/nick-friedrich/beesting/app/example-api/pkg/mail"
 	passwordPkg "github.com/nick-friedrich/beesting/app/example-api/pkg/password"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
 	"github.com/nick-friedrich/beesting/app/example-api/pkg/validation"
@@ -21,6 +22,26 @@ import (
 // Legacy validation functions removed - now using validator v10 struct-based validation
 
 // TODO: Send confirmation email function
+func sendConfirmationEmail(user *db.User) error {
+	config := config.GetConfig()
+	mailer := mail.GetMailer()
+	err := mailer.SendEmail(&mail.Email{
+		From:    "noreply@example.com",
+		To:      user.Email,
+		Subject: "Confirm your email",
+		Body: fmt.Sprintf(`
+Please click the link to confirm your email: 
+%s/verify-email?token=%s
+		`,
+			config.BaseURL,
+			user.Confirmemailtoken.String,
+		),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -33,6 +54,7 @@ func LoginHandler() http.HandlerFunc {
 
 		registered := r.URL.Query().Get("registered") == "true"
 		confirmEmail := r.URL.Query().Get("confirmEmail") == "true"
+		emailSent := r.URL.Query().Get("emailSent") == "true"
 
 		var successMessage string
 		if registered {
@@ -41,14 +63,18 @@ func LoginHandler() http.HandlerFunc {
 		if confirmEmail {
 			successMessage = "Email confirmed! Please log in with your credentials."
 		}
+		if emailSent {
+			successMessage = "Confirmation email sent! Please check your inbox and click the verification link."
+		}
 
 		views.Layout(
 			authviews.Login(authviews.LoginProps{
-				Errors:         types.AuthValidationErrors{},
-				Email:          "",
-				SuccessMessage: successMessage,
-				ErrorMessage:   "",
-				Request:        r,
+				Errors:                types.AuthValidationErrors{},
+				Email:                 "",
+				SuccessMessage:        successMessage,
+				ErrorMessage:          "",
+				ShowResendConfirmLink: false,
+				Request:               r,
 			}),
 			sessionData,
 			"Login",
@@ -100,11 +126,12 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 			errors := validation.ConvertValidationErrors(err)
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
-					Errors:         errors,
-					Email:          form.Email,
-					SuccessMessage: "",
-					ErrorMessage:   "",
-					Request:        r,
+					Errors:                errors,
+					Email:                 form.Email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
 				}),
 				sessionData,
 				"Login",
@@ -119,33 +146,17 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 			fmt.Printf("Login attempt failed: email=%s, error=%v\n", form.Email, err)
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
-					Errors:         types.AuthValidationErrors{General: "Invalid email or password"},
-					Email:          form.Email,
-					SuccessMessage: "",
-					ErrorMessage:   "",
-					Request:        r,
+					Errors:                types.AuthValidationErrors{General: "Invalid email or password"},
+					Email:                 form.Email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
 				}),
 				sessionData,
 				"Login",
 			).Render(r.Context(), w)
 
-			return
-		}
-
-		// Get config and check if verified if enabled
-		config := config.GetConfig()
-		if config.AuthConfig.ConfirmEmail && !user.Confirmedat.Valid {
-			views.Layout(
-				authviews.Login(authviews.LoginProps{
-					Errors:         types.AuthValidationErrors{General: "Email not verified. Please check your email for a verification link."},
-					Email:          form.Email,
-					SuccessMessage: "",
-					ErrorMessage:   "",
-					Request:        r,
-				}),
-				sessionData,
-				"Login",
-			).Render(r.Context(), w)
 			return
 		}
 
@@ -158,10 +169,11 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 					Errors: types.AuthValidationErrors{
 						General: "Authentication error. Please try again.",
 					},
-					Email:          form.Email,
-					SuccessMessage: "",
-					ErrorMessage:   "",
-					Request:        r,
+					Email:                 form.Email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
 				}),
 				sessionData,
 				"Login",
@@ -177,15 +189,34 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 					Errors: types.AuthValidationErrors{
 						General: "Invalid email or password",
 					},
-					Email:          form.Email,
-					SuccessMessage: "",
-					ErrorMessage:   "",
-					Request:        r,
+					Email:                 form.Email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
 				}),
 				sessionData,
 				"Login",
 			).Render(r.Context(), w)
 
+			return
+		}
+
+		// Get config and check if verified if enabled
+		config := config.GetConfig()
+		if config.AuthConfig.ConfirmEmail && !user.Confirmedat.Valid {
+			views.Layout(
+				authviews.Login(authviews.LoginProps{
+					Errors:                types.AuthValidationErrors{General: "Email not verified. Please check your email for a verification link."},
+					Email:                 form.Email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: true,
+					Request:               r,
+				}),
+				sessionData,
+				"Login",
+			).Render(r.Context(), w)
 			return
 		}
 
@@ -197,11 +228,12 @@ func LoginSubmitHandler(q *db.Queries) http.HandlerFunc {
 
 			views.Layout(
 				authviews.Login(authviews.LoginProps{
-					Errors:         types.AuthValidationErrors{General: "Login successful but session error. Please try again."},
-					Email:          form.Email,
-					SuccessMessage: "",
-					ErrorMessage:   "",
-					Request:        r,
+					Errors:                types.AuthValidationErrors{General: "Login successful but session error. Please try again."},
+					Email:                 form.Email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
 				}),
 				sessionData,
 				"Login",
@@ -283,6 +315,7 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 			Confirmemailtokenexpiresat: sql.NullTime{Time: confirmEmailTokenExpiresAt, Valid: true},
 		})
 
+		// Error handling
 		if err != nil {
 			fmt.Printf("User creation error: %v\n", err)
 			// Check if it's a unique constraint violation
@@ -336,6 +369,12 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 			return
 		}
 
+		// Send confirmation email
+		err = sendConfirmationEmail(&user)
+		if err != nil {
+			fmt.Printf("Confirmation email error: %v\n", err)
+		}
+
 		fmt.Printf("User created: %+v\n", user)
 
 		// Build URL with config
@@ -344,6 +383,143 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 		} else {
 			http.Redirect(w, r, "/login?registered=true", http.StatusSeeOther)
 		}
+	}
+}
+
+func VerifyEmailHandler(q *db.Queries) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token := r.URL.Query().Get("token")
+		if token == "" {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		user, err := q.GetByConfirmEmailToken(r.Context(), sql.NullString{String: token, Valid: true})
+		if err != nil {
+			http.Error(w, "Invalid token", http.StatusBadRequest)
+			return
+		}
+		if user.ID == "" {
+			http.Error(w, "Invalid token", http.StatusBadRequest)
+			return
+		}
+		if user.Confirmedat.Valid {
+			http.Error(w, "Email already verified", http.StatusBadRequest)
+			return
+		}
+		if user.Confirmemailtokenexpiresat.Time.Before(time.Now()) {
+			http.Error(w, "Token expired", http.StatusBadRequest)
+			return
+		}
+
+		// Confirm the user's email
+		err = q.ConfirmUserEmail(r.Context(), user.ID)
+		if err != nil {
+			http.Error(w, "Failed to confirm email", http.StatusInternalServerError)
+			return
+		}
+
+		// Redirect to login with success message
+		http.Redirect(w, r, "/login?confirmEmail=true", http.StatusSeeOther)
+	}
+}
+
+func ResendConfirmationEmailHandler(q *db.Queries) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sessionData, _ := session.Default.GetSession(r)
+
+		// Don't allow resending if already logged in
+		if sessionData.LoggedIn {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		// Get email from form
+		email := strings.TrimSpace(r.Form.Get("email"))
+		if email == "" {
+			views.Layout(
+				authviews.Login(authviews.LoginProps{
+					Errors:                types.AuthValidationErrors{General: "Email is required"},
+					Email:                 "",
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
+				}),
+				sessionData,
+				"Login",
+			).Render(r.Context(), w)
+			return
+		}
+
+		// Get user by email
+		user, err := q.GetUserByEmail(r.Context(), email)
+		if err != nil {
+			// Don't reveal if user exists or not - just show success message
+			http.Redirect(w, r, "/login?emailSent=true", http.StatusSeeOther)
+			return
+		}
+
+		// Check if already confirmed
+		if user.Confirmedat.Valid {
+			views.Layout(
+				authviews.Login(authviews.LoginProps{
+					Errors:                types.AuthValidationErrors{General: "Email already confirmed. Please log in."},
+					Email:                 email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
+				}),
+				sessionData,
+				"Login",
+			).Render(r.Context(), w)
+			return
+		}
+
+		// Generate new confirmation token
+		confirmEmailToken := ulid.Make().String()
+		confirmEmailTokenExpiresAt := time.Now().Add(time.Hour * 24)
+
+		// Update user with new token
+		err = q.UpdateUser(r.Context(), db.UpdateUserParams{
+			ID:                         user.ID,
+			Name:                       user.Name,
+			Email:                      user.Email,
+			PasswordHash:               user.PasswordHash,
+			Confirmemailtoken:          sql.NullString{String: confirmEmailToken, Valid: true},
+			Confirmemailtokenexpiresat: sql.NullTime{Time: confirmEmailTokenExpiresAt, Valid: true},
+		})
+		if err != nil {
+			fmt.Printf("Failed to update user with new token: %v\n", err)
+			views.Layout(
+				authviews.Login(authviews.LoginProps{
+					Errors:                types.AuthValidationErrors{General: "Failed to send confirmation email. Please try again."},
+					Email:                 email,
+					SuccessMessage:        "",
+					ErrorMessage:          "",
+					ShowResendConfirmLink: false,
+					Request:               r,
+				}),
+				sessionData,
+				"Login",
+			).Render(r.Context(), w)
+			return
+		}
+
+		// Update user struct with new token for email sending
+		user.Confirmemailtoken = sql.NullString{String: confirmEmailToken, Valid: true}
+		user.Confirmemailtokenexpiresat = sql.NullTime{Time: confirmEmailTokenExpiresAt, Valid: true}
+
+		// Send confirmation email
+		err = sendConfirmationEmail(&user)
+		if err != nil {
+			fmt.Printf("Confirmation email error: %v\n", err)
+			// Still redirect to success to avoid revealing if user exists
+		}
+
+		// Redirect to login with success message
+		http.Redirect(w, r, "/login?emailSent=true", http.StatusSeeOther)
 	}
 }
 

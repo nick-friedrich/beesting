@@ -6,9 +6,11 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 type Querier interface {
+	ConfirmUserEmail(ctx context.Context, id string) error
 	CountPosts(ctx context.Context) (int64, error)
 	CountPublishedPosts(ctx context.Context) (int64, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
@@ -18,6 +20,7 @@ type Querier interface {
 	DeletePost(ctx context.Context, id int64) error
 	DeleteSession(ctx context.Context, id string) error
 	DeleteUserSessions(ctx context.Context, userID string) error
+	GetByConfirmEmailToken(ctx context.Context, confirmemailtoken sql.NullString) (User, error)
 	GetPost(ctx context.Context, id int64) (Post, error)
 	GetPostBySlug(ctx context.Context, slug string) (Post, error)
 	GetSession(ctx context.Context, id string) (Session, error)
@@ -30,6 +33,7 @@ type Querier interface {
 	UnpublishPost(ctx context.Context, id int64) error
 	UpdatePost(ctx context.Context, arg UpdatePostParams) (Post, error)
 	UpdateSessionAccess(ctx context.Context, id string) error
+	UpdateUser(ctx context.Context, arg UpdateUserParams) error
 }
 
 var _ Querier = (*Queries)(nil)

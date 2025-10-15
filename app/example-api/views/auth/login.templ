@@ -9,11 +9,12 @@ import (
 )
 
 type LoginProps struct {
-	Errors         types.AuthValidationErrors
-	Email          string
-	SuccessMessage string
-	ErrorMessage   string
-	Request        *http.Request
+	Errors                types.AuthValidationErrors
+	Email                 string
+	SuccessMessage        string
+	ErrorMessage          string
+	ShowResendConfirmLink bool
+	Request               *http.Request
 }
 
 templ Login(props LoginProps) {
@@ -25,6 +26,17 @@ templ Login(props LoginProps) {
 					AlertType: components.AlertTypeError,
 					Message:   props.Errors.General,
 				})
+				if props.ShowResendConfirmLink {
+					<div class="mt-4 text-center">
+						<form method="post" action="/resend-confirmation" class="inline">
+							@components.CSRF(props.Request)
+							<input type="hidden" name="email" value={ props.Email }/>
+							<button type="submit" class="link link-primary text-sm font-medium">
+								Resend confirmation email
+							</button>
+						</form>
+					</div>
+				}
 			}
 			if props.SuccessMessage != "" {
 				@components.Alert(components.AlertProps{

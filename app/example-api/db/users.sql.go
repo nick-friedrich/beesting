@@ -10,6 +10,20 @@ import (
 	"database/sql"
 )
 
+const confirmUserEmail = `-- name: ConfirmUserEmail :exec
+UPDATE users
+SET confirmedat = CURRENT_TIMESTAMP,
+    confirmEmailToken = NULL,
+    confirmEmailTokenExpiresAt = NULL,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = ?
+`
+
+func (q *Queries) ConfirmUserEmail(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, confirmUserEmail, id)
+	return err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, name, email, password_hash, confirmEmailToken, confirmEmailTokenExpiresAt)
 VALUES (?, ?, ?, ?, ?, ?)
@@ -34,6 +48,30 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Confirmemailtoken,
 		arg.Confirmemailtokenexpiresat,
 	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.PasswordHash,
+		&i.Role,
+		&i.Confirmedat,
+		&i.Confirmemailtoken,
+		&i.Confirmemailtokenexpiresat,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getByConfirmEmailToken = `-- name: GetByConfirmEmailToken :one
+SELECT id, name, email, password_hash, role, confirmedat, confirmemailtoken, confirmemailtokenexpiresat, created_at, updated_at FROM users
+WHERE confirmEmailToken = ?
+LIMIT 1
+`
+
+func (q *Queries) GetByConfirmEmailToken(ctx context.Context, confirmemailtoken sql.NullString) (User, error) {
+	row := q.db.QueryRowContext(ctx, getByConfirmEmailToken, confirmemailtoken)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -96,4 +134,37 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :exec
+UPDATE users
+SET name = ?,
+    email = ?,
+    password_hash = ?,
+    confirmEmailToken = ?,
+    confirmEmailTokenExpiresAt = ?,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = ?
+RETURNING id, name, email, role, confirmedat, confirmemailtoken, confirmemailtokenexpiresat, created_at, updated_at
+`
+
+type UpdateUserParams struct {
+	Name                       string         `json:"name"`
+	Email                      string         `json:"email"`
+	PasswordHash               string         `json:"password_hash"`
+	Confirmemailtoken          sql.NullString `json:"confirmemailtoken"`
+	Confirmemailtokenexpiresat sql.NullTime   `json:"confirmemailtokenexpiresat"`
+	ID                         string         `json:"id"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.db.ExecContext(ctx, updateUser,
+		arg.Name,
+		arg.Email,
+		arg.PasswordHash,
+		arg.Confirmemailtoken,
+		arg.Confirmemailtokenexpiresat,
+		arg.ID,
+	)
+	return err
 }

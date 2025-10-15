@@ -22,6 +22,7 @@ func main() {
 
 	// Initialize config
 	config.InitConfig(&config.Config{
+		BaseURL: "http://localhost:3000",
 		AuthConfig: config.AuthConfig{
 			ConfirmEmail: true,
 		},
@@ -99,6 +100,8 @@ func main() {
 	r.Post("/login", handler.LoginSubmitHandler(queries))
 	r.Post("/register", handler.RegisterSubmitHandler(queries))
 	r.Get("/logout", handler.LogoutHandler())
+	r.Get("/verify-email", handler.VerifyEmailHandler(queries))
+	r.Post("/resend-confirmation", handler.ResendConfirmationEmailHandler(queries))
 
 	// 404 handler for unmatched routes
 	r.NotFound(handler.NotFound())
