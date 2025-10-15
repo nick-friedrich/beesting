@@ -317,42 +317,18 @@ func RegisterSubmitHandler(q *db.Queries) http.HandlerFunc {
 		// Error handling
 		if err != nil {
 			fmt.Printf("User creation error: %v\n", err)
-			// Check if it's a unique constraint violation
-			if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-				if strings.Contains(err.Error(), "email") {
-					views.Layout(
-						authviews.Register(authviews.RegisterProps{
-							Errors:  types.AuthValidationErrors{Email: "Email already exists. Please use a different email."},
-							Name:    form.Name,
-							Email:   form.Email,
-							Request: r,
-						}),
-						sessionData,
-						"Register",
-					).Render(r.Context(), w)
-				} else if strings.Contains(err.Error(), "name") {
-					views.Layout(
-						authviews.Register(authviews.RegisterProps{
-							Errors:  types.AuthValidationErrors{Name: "Username already exists. Please choose a different name."},
-							Name:    form.Name,
-							Email:   form.Email,
-							Request: r,
-						}),
-						sessionData,
-						"Register",
-					).Render(r.Context(), w)
-				} else {
-					views.Layout(
-						authviews.Register(authviews.RegisterProps{
-							Errors:  types.AuthValidationErrors{General: "Registration error. Please try again."},
-							Name:    form.Name,
-							Email:   form.Email,
-							Request: r,
-						}),
-						sessionData,
-						"Register",
-					).Render(r.Context(), w)
-				}
+			// Check if it's a unique constraint violation on email
+			if strings.Contains(err.Error(), "UNIQUE constraint failed") && strings.Contains(err.Error(), "email") {
+				views.Layout(
+					authviews.Register(authviews.RegisterProps{
+						Errors:  types.AuthValidationErrors{Email: "Email already exists. Please use a different email."},
+						Name:    form.Name,
+						Email:   form.Email,
+						Request: r,
+					}),
+					sessionData,
+					"Register",
+				).Render(r.Context(), w)
 			} else {
 				views.Layout(
 					authviews.Register(authviews.RegisterProps{
