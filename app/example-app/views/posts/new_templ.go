@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"net/http"
 
-	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
+	components "github.com/nick-friedrich/beesting/app/example-app/views/components"
 )
 
 func New(r *http.Request) templ.Component {

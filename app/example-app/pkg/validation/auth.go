@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/nick-friedrich/beesting/app/example-api/types"
+	"github.com/nick-friedrich/beesting/app/example-app/types"
 )
 
 // LoginForm represents login form data with validation tags

@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/nick-friedrich/beesting/app/example-api/views/utils"
+import "github.com/nick-friedrich/beesting/app/example-app/views/utils"
 
 type AlertProps struct {
 	AlertType AlertType

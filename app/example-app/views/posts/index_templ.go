@@ -13,11 +13,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nick-friedrich/beesting/app/example-api/db"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/html"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/markdown"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
+	"github.com/nick-friedrich/beesting/app/example-app/db"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/html"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/markdown"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/session"
+	components "github.com/nick-friedrich/beesting/app/example-app/views/components"
 )
 
 func genHref(slug string) string {

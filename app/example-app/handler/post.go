@@ -6,11 +6,11 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/nick-friedrich/beesting/app/example-api/db"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/slug"
-	"github.com/nick-friedrich/beesting/app/example-api/views"
-	postviews "github.com/nick-friedrich/beesting/app/example-api/views/posts"
+	"github.com/nick-friedrich/beesting/app/example-app/db"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/session"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/slug"
+	"github.com/nick-friedrich/beesting/app/example-app/views"
+	postviews "github.com/nick-friedrich/beesting/app/example-app/views/posts"
 )
 
 func ShowPosts(q *db.Queries) http.HandlerFunc {

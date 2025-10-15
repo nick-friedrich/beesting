@@ -11,9 +11,9 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"net/http"
 
-	"github.com/nick-friedrich/beesting/app/example-api/types"
-	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
-	viewUtils "github.com/nick-friedrich/beesting/app/example-api/views/utils"
+	"github.com/nick-friedrich/beesting/app/example-app/types"
+	components "github.com/nick-friedrich/beesting/app/example-app/views/components"
+	viewUtils "github.com/nick-friedrich/beesting/app/example-app/views/utils"
 )
 
 type RegisterProps struct {

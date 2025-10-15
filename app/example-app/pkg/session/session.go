@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nick-friedrich/beesting/app/example-api/db"
+	"github.com/nick-friedrich/beesting/app/example-app/db"
 )
 
 // SessionData holds the session information

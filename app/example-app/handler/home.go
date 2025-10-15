@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	"github.com/nick-friedrich/beesting/app/example-api/views"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/session"
+	"github.com/nick-friedrich/beesting/app/example-app/views"
 )
 
 func Home() http.HandlerFunc {

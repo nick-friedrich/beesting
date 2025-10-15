@@ -11,8 +11,8 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"net/http"
 
-	"github.com/nick-friedrich/beesting/app/example-api/db"
-	components "github.com/nick-friedrich/beesting/app/example-api/views/components"
+	"github.com/nick-friedrich/beesting/app/example-app/db"
+	components "github.com/nick-friedrich/beesting/app/example-app/views/components"
 )
 
 func Edit(post db.Post, r *http.Request) templ.Component {

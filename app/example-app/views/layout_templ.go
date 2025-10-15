@@ -9,7 +9,7 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/nick-friedrich/beesting/app/example-api/pkg/session"
+import "github.com/nick-friedrich/beesting/app/example-app/pkg/session"
 
 func Layout(contents templ.Component, session *session.SessionData, title string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {

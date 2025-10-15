@@ -10,12 +10,12 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/csrf"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/nick-friedrich/beesting/app/example-api/db"
-	"github.com/nick-friedrich/beesting/app/example-api/handler"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/config"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/mail"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/session"
-	"github.com/nick-friedrich/beesting/app/example-api/pkg/validation"
+	"github.com/nick-friedrich/beesting/app/example-app/db"
+	"github.com/nick-friedrich/beesting/app/example-app/handler"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/config"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/mail"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/session"
+	"github.com/nick-friedrich/beesting/app/example-app/pkg/validation"
 )
 
 func main() {

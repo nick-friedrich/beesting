@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/nick-friedrich/beesting/app/example-api/db"
+	"github.com/nick-friedrich/beesting/app/example-app/db"
 )
 
 // Handler functions
