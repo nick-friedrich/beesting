@@ -10,7 +10,7 @@ const { result } = concurrently(
     "npm:watch-*",
     { command: "npm run watch-css", name: "Tailwind" },
     {
-      command: "cd ../.. && go run ./cmd/beesting dev example-api",
+      command: "cd ../.. && go run ./cmd/beesting dev example-app",
       name: "Beesting",
     },
     // { command: "deploy", name: "deploy", env: { PUBLIC_KEY: "..." } },

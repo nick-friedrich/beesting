@@ -37,7 +37,7 @@ Usage:
 			return createFromDefaultTemplate(projectName)
 		}
 
-		// beesting new example-api my-project (fetch from GitHub)
+		// beesting new example-app my-project (fetch from GitHub)
 		templateName = args[0]
 		projectName = args[1]
 		return createFromGitHubTemplate(templateName, projectName)

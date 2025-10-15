@@ -35,23 +35,23 @@ beesting dev my-app
 Gen types:
 
 ```bash
-cd /Users/nick/dev/beesting/app/example-api && sqlc generate
+cd /Users/nick/dev/beesting/app/example-app && sqlc generate
 ```
 
 Create new empty migration:
 
 ```bash
-cd /Users/nick/dev/beesting/app/example-api && goose -dir db/migrations create add_user_table sql
+cd /Users/nick/dev/beesting/app/example-app && goose -dir db/migrations create add_user_table sql
 ```
 
 Run migrations:
 
 ```bash
-cd /Users/nick/dev/beesting/app/example-api && goose -dir db/migrations sqlite3 ./app.db up
+cd /Users/nick/dev/beesting/app/example-app && goose -dir db/migrations sqlite3 ./app.db up
 ```
 
 Rollback migrations:
 
 ```bash
-cd /Users/nick/dev/beesting/app/example-api && goose -dir db/migrations sqlite3 ./app.db down
+cd /Users/nick/dev/beesting/app/example-app && goose -dir db/migrations sqlite3 ./app.db down
 ```

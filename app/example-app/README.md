@@ -35,7 +35,7 @@ make dev
 npm run dev
 
 # Or using root Makefile
-cd ../.. && make dev example-api
+cd ../.. && make dev example-app
 
 # Or directly
 go run main.go
@@ -51,7 +51,7 @@ go run main.go
 ## Project Structure
 
 ```
-app/example-api/
+app/example-app/
 ├── db/                    # Database layer
 │   ├── migrations/        # Goose migrations
 │   ├── queries/          # SQLC queries

@@ -33,7 +33,7 @@ go install github.com/pressly/goose/v3/cmd/goose@latest
 ### 2. Generate SQLC Code
 
 ```bash
-cd app/example-api
+cd app/example-app
 sqlc generate
 ```
 
@@ -42,7 +42,7 @@ sqlc generate
 ### Create a New Migration
 
 ```bash
-cd app/example-api
+cd app/example-app
 goose -dir db/migrations create add_comments sql
 ```
 
